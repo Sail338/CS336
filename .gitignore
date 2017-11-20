@@ -1,0 +1,7 @@
+*.log
+*.pyc
+__pycache__
+*.yaml
+pip-selfcheck.json
+hotel
+dbisfun
