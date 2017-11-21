@@ -5,10 +5,23 @@
     <title>title</title>
   </head>
   <body>
+    {% if error and length != 0 %}
+      <h3>There was an error with your query, check your:</h3>
+      {% for e in error %}
+        <li>{{e}}</li>
+      {% endfor %}
+    {% endif %}
     <form action="/search" method="POST">
         <h2>Search Page</h2>
-        What are you looking for?:<br>
-        <input type="text" name="search"><br>
+        **For more than 1 country/state, put a comma between each new country/state**
+        <br>Countries:<br>
+        <input type="text" name="country"><br>
+        <br>
+        States:<br>
+        <input type="text" name="state"><br>
+        <br>
+        Check-In Date----Check-Out Date:<br>
+        <input type="date" name="entry">----<input type="date" name="depart">
         <br>
         Minimum - Maximum Cost
         <input type="text" name="min">-------<input type="text" name="max">

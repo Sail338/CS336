@@ -46,7 +46,7 @@ def dashboard():
             #user = {}
             #user will a dictionary that contains all the information from the user
             #that the html will use to display the corresponding data
-            user = {"Name": "Sam Azouzi","Age":19}
+            user = {"Name": "Sam Azouzi","Age":20}
             return render_template('dashboard.html', user=user)
     else:
         return redirect(url_for('home'))
@@ -58,8 +58,21 @@ def search_page():
 @app.route("/search", methods=['POST'])
 def search():
     #Need to sanitize this data
-    query = request.form['search']
-    print(query)
+    #IF THERE ARE ANY ERRORS IN THE QUERY, ADD A STRING TO THE ERROR LIST DESCRIBING THE ERROR
+    #e.g. "Incorrect Date Format"
+    error = []
+    error.append("Error in Data")
+    error.append("Error in country")
+    countries = request.form['country']
+    print(countries)
+    states = request.form['state']
+    print(states)
+    #entry and depart can be delimited by a -
+    #NEED TO CHECK ACCURACY OF THIS, IF THE YEAR HAS MORE THAN 4 DIGITS -> Incorrect
+    entry = request.form['entry']
+    print(entry)
+    depart = request.form['depart']
+    print(depart)
     minCost = request.form['min']
     print(minCost)
     maxCost = request.form['max']
@@ -67,6 +80,11 @@ def search():
     services = request.form.getlist('service')
     for x in services:
         print(x)
+    services = request.form.getlist('breakfast')
+    for x in services:
+        print(x)
+    if error:
+        return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
     results = [{"HName":"Sampton","Phone":"9171233377"},{"HName":"Shripton","Phone":"91783821377"},{"HName":"Hemanpton","Phone":"993921377"}]
     return render_template('search.html',result=results)
