@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+    {% if user %}
+      <h2>Hello {{user['Name']}}!</h1>
+      <h2>Must suck to be {{user['Age']}}</h2>
+      <form action="/logoff" method="GET">
+          <button type="submit">Log Off</button>
+      </form>
+    {% else %}
+      <h2>No user credentials found, did you login?</h2>
+    {% endif %}
+  </body>
+</html>

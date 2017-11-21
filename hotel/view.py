@@ -50,6 +50,23 @@ def dashboard():
             return render_template('dashboard.html', user=user)
     else:
         return redirect(url_for('home'))
+
+@app.route("/search-page")
+def search_page():
+    return render_template('search.html')
+
+@app.route("/search")
+def search():
+    #Need to sanitize this data
+    query = request.form['search']
+    minCost = request.form['min']
+    maxCost = request.form['max']
+    services = require.form['service']
+    print services
+
+
+
+
 #@app.route('/registration')
 
 #@app.route('/register')

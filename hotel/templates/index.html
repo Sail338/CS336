@@ -5,7 +5,7 @@
     <title>title</title>
   </head>
   <body>
-    <form action="/authorize" method="POST">
+      <form action="/authorize" method="POST">
         {% if incorrect%}
           <h3>Incorrect Credentials Given</h3>
         {%elif logoff%}
@@ -20,5 +20,9 @@
         <br>
         <button type="submit">Enter</button>
         </form>
+      <form action="/search-page" method="GET">
+        Search:<br>
+        <input type="text" name="submit">
+        <br>
   </body>
 </html>

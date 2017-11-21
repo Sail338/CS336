@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+    <form action="/search" method="POST">
+        <h2>Search Page</h2>
+        What are you looking for?:<br>
+        <input type="text" name="search"><br>
+        <br>
+        Minimum - Maximum Cost
+        <input type="text" name="min">-------<input type="text" name="max">
+        <br>
+        <fieldset>
+          <legend>Please select Services you want:</legend>
+          <input type="radio" name="service" id="s1" value="s1" /><label for="s1">Service 1</label><br />
+          <input type="radio" name="service" id="s2" value="s2"  /><label for="s2">Service 2</label><br />
+          <input type="radio" name="service" id="s3" value="s3" /><label for="s3">Service 3</label><br />
+        </fieldset>
+        <br>
+        <button type="submit">Search</button>
+        </form>
+  </body>
+</html>
