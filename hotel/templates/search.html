@@ -12,15 +12,30 @@
         <br>
         Minimum - Maximum Cost
         <input type="text" name="min">-------<input type="text" name="max">
-        <br>
+        <br><br>
         <fieldset>
-          <legend>Please select Services you want:</legend>
-          <input type="radio" name="service" id="s1" value="s1" /><label for="s1">Service 1</label><br />
-          <input type="radio" name="service" id="s2" value="s2"  /><label for="s2">Service 2</label><br />
-          <input type="radio" name="service" id="s3" value="s3" /><label for="s3">Service 3</label><br />
-        </fieldset>
+        <legend>Please select Services you want:</legend>
+        <input type="checkbox" name="service" value="Service 1">Service 1<br>
+        <input type="checkbox" name="service" value="Service 2">Service 2<br>
+        <input type="checkbox" name="service" value="Service 3">Service 3<br>
+        <input type="checkbox" name="service" value="Service 4">Service 4<br>
+        <input type="checkbox" name="service" value="Service 5">Service 5<br>
         <br>
+        </fieldset>
+        <br><br>
+        <fieldset>
+        <legend>Please select Breakfasts you want:</legend>
+        <input type="checkbox" name="breakfast" value="Breakfast 1">Service 1<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 2">Service 2<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 3">Service 3<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 4">Service 4<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 5">Service 5<br>
+        <br>
+        </fieldset>
         <button type="submit">Search</button>
-        </form>
+    </form>
+    {% if results %}
+      
+    {% endif %}
   </body>
 </html>

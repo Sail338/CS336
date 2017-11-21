@@ -1,3 +1,3 @@
 from flask import Flask
 app=Flask(__name__)
-import view
+from hotel import view

@@ -7,9 +7,9 @@ def home():
 @app.route('/authorize', methods=['POST'])
 def authorize_credentials():
     username = request.form['username']
-    print username
+    print(username)
     password = request.form['password']
-    print password
+    print(password)
     info_correct = True
     #Check username and password in the database
     if info_correct:
@@ -23,7 +23,7 @@ def authorize_credentials():
         response.set_cookie('Session', username)
         return response
     else:
-        print "Incorrect Information Given"
+        print("Incorrect Information Given")
         return render_template('index.html',incorrect=True,logoff=False)
 
 
@@ -55,14 +55,24 @@ def dashboard():
 def search_page():
     return render_template('search.html')
 
-@app.route("/search")
+@app.route("/search", methods=['POST'])
 def search():
     #Need to sanitize this data
     query = request.form['search']
+    print(query)
     minCost = request.form['min']
+    print(minCost)
     maxCost = request.form['max']
-    services = require.form['service']
-    print services
+    print(maxCost)
+    services = request.form.getlist('service')
+    for x in services:
+        print(x)
+    #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
+    hotels = []
+    return render_template('search.html',results=resuult)
+
+
+
 
 
 
