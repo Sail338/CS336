@@ -25,17 +25,20 @@
         <br><br>
         <fieldset>
         <legend>Please select Breakfasts you want:</legend>
-        <input type="checkbox" name="breakfast" value="Breakfast 1">Service 1<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 2">Service 2<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 3">Service 3<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 4">Service 4<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 5">Service 5<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 1">Breakfast 1<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 2">Breakfast 2<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 3">Breakfast 3<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 4">Breakfast 4<br>
+        <input type="checkbox" name="breakfast" value="Breakfast 5">Breakfast 5<br>
         <br>
         </fieldset>
         <button type="submit">Search</button>
     </form>
-    {% if results %}
-      
+    {% if result %}
+      {% for hotel in result %}
+        <li>Hotel Name: {{hotel['HName']}}</li>
+        <li>Hotel Phone Number: {{hotel['Phone']}} </li>
+      {% endfor %}
     {% endif %}
   </body>
 </html>

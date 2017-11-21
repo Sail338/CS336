@@ -68,8 +68,8 @@ def search():
     for x in services:
         print(x)
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    hotels = []
-    return render_template('search.html',results=resuult)
+    results = [{"HName":"Sampton","Phone":"9171233377"},{"HName":"Shripton","Phone":"91783821377"},{"HName":"Hemanpton","Phone":"993921377"}]
+    return render_template('search.html',result=results)
 
 
 
