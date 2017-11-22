@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+      {% if error and length != 0 %}
+        <h3>There was an error with your request, check your:</h3>
+        {% for e in error %}
+          <li>{{e}}</li>
+        {% endfor %}
+      {% endif %}
+      {%if edit%}
+            <form action="/account_settings" method="POST">
+              <h2>Account Settings</h2>
+              <br>
+              Password:    <input type="password" name="password"><br>
+              <br>
+              New Password:<input type="password" name="new_password" placeholder="If not changing password, repeat current password"><br>
+              <br>
+              Email:       <input type="text" name="email">
+              <br>
+              Phone #:     <input type="text" name="phone">
+              <br>
+              <button type="submit" name="submit" value="confirm">confirm</button>
+              </form>
+      {%else%}
+              <form action="/account_settings" method="GET">
+                <h2>Hello {{info['name']}}!</h2> <br>
+                <h2>Account Settings</h2>
+                Email:      {{info['email']}}
+                <br>
+                Phone #:    {{info['phone']}}
+                <br>
+                <button type="submit" value="edit">Edit</button>
+                </form>
+      {%endif%}
+          <h2>Credit Cards</h2>
+          {%if credit_list%}
+            {%for c in credit_list%}
+            <form action="/remove" method="POST">
+              <fieldset>
+                <legend name="cnumber">{{c['cnumber']}}</legend>
+                ExpDate: {{c['expdate']}} <br>
+                Type:    {{c['type']}} <br>
+                SecCode: {{c['seccode']}} <br>
+                Name on Card: {{c['name']}}
+                Billing Address: {{c['addr']}}
+              </fieldset>
+              <button type="submit">Remove</button>
+              <br><br>
+            {%endfor%}
+          {%endif%}
+  </body>
+</html>

@@ -51,8 +51,9 @@ def dashboard():
     else:
         return redirect(url_for('home'))
 
-@app.route("/search-page")
+@app.route("/search-page", methods=['POST'])
 def search_page():
+    print request.form['search']
     return render_template('search.html')
 
 @app.route("/search", methods=['POST'])
@@ -89,6 +90,43 @@ def search():
     results = [{"HName":"Sampton","Phone":"9171233377"},{"HName":"Shripton","Phone":"91783821377"},{"HName":"Hemanpton","Phone":"993921377"}]
     return render_template('search.html',result=results)
 
+@app.route("/account_settings", methods=['GET','POST'])
+def account():
+    if request.method == 'GET':
+        #set variable info = the query that gives us the information of the user given session cookies
+        user_id = request.cookies.get('Session')
+        if request.form['submit'] != 'edit'
+            if user_id:
+                #info = user information
+                info = {"name":"Sam Azouzi","email":"sazouzi21@gmail.com","phone":"1234567891234"}
+                #credit_list will be a list of all this users credit cards
+                credit_list = [
+                {"cnumber":"12345617",
+                 "expdate":"10/30/2017",
+                 "type":"D",
+                 "seccode":"123",
+                 "name":"Sam Azouzi",
+                 "addr":"78 Woodbridge Lane something something"},
+                {"cnumber":"123412317",
+                 "expdate":"10/31/2017",
+                 "type":"C",
+                 "seccode":"123",
+                 "name":"Samd Azouzi",
+                 "addr":"21 Woodbridge Lane something something"},
+                {"cnumber":"321245617",
+                 "expdate":"11/30/2017",
+                 "type":"D",
+                 "seccode":"113",
+                 "name":"Sazouzi",
+                 "addr":"98 Woodbridge Lane something something"}
+                ]
+                return render_template('account.html',info=info,credit_list=credit_list)
+        else:
+            #Continue
+    else:
+        user_id = request.cookies.get('Session')
+        if user_id:
+            return
 
 
 
