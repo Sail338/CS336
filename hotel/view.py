@@ -145,14 +145,28 @@ def register_account():
         return "Error: Bad values"
 @app.route('/register', methods=['GET']))
 def register_page():
+    # return registration page
     pass
+
 @app.route('/profile', methods=['GET'])
 def get_profile():
     user = request.cookies.get('username')
 
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
-    user = request.cookies.get("username")
+    m = hashlib.sha1()
+    try:
+        password = m.update(request.form['password'].encode('utf-8').hexdigest()
+        update_cards = request.form['cards'] # perform set operation to figure out which cards to add, update, and delete
+        existing_cards = [] # getCreditCardsForUser(
+        update_card_nos = set([card['card_no'] for card in existing_cards])
+        existing_card_nos = set([card['card_no'] for card in update_card_nos])
+        add_cards = update_card_nos - existing_card_nos # add these cards to db
+        update_cards = update_card_nos & existing_card_nos # update these cards in db
+        remove_cards = existing_card_nos - update_card_nos # remove these cards in db
+        return "OK"
+    else:
+        return "ERROR"
 
 @app.route('/browse', methods=['GET'])
 def browse():
