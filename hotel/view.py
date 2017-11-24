@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, json, redirect, url_for, make_response
 from hotel import app
+from hotel.util import InsertQuery, InsertQueryKV
+import hashlib
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -128,21 +130,38 @@ def account():
         if user_id:
             return
 
+app.route('/registration', methods=['POST'])
+def register_account():
+    m = hashlib.sha1()
+    try:
+        args = {
+            "Email": request.form['email'],
+            "Password": m.update(request.form['password'].encode('utf-8')).hexdigest()
+        }
+        print(args)
+        # InsertQueryKV("Account", args) # Insert into db
+        return "200"
+    except:
+        return "Error: Bad values"
+@app.route('/register', methods=['GET']))
+def register_page():
+    pass
+@app.route('/profile', methods=['GET'])
+def get_profile():
+    user = request.cookies.get('username')
 
+@app.route('/profileedit', methods=['POST'])
+def edit_profile():
+    user = request.cookies.get("username")
 
+@app.route('/browse', methods=['GET'])
+def browse():
+    pass
 
+@app.route('/reserve', methods=['POST'])
+def reserve():
+    pass
 
-
-#@app.route('/registration')
-
-#@app.route('/register')
-
-#@app.route('/profile')
-
-#@app.route('/profile-edit')
-
-#@app.route('/browse')
-
-#@app.route('/reserve')
-
-#@app.route('/registerHotel')
+@app.route('/registerhotel', methods=['POST'])
+def register_hotel():
+    pass

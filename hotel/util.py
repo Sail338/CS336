@@ -29,6 +29,18 @@ def InsertQuery(query:str, x):
         cursor.execute(query,x)
     con.commit()
 
+def InsertQueryKV(table, fields):
+    keys = []
+    values = []
+    for k,v in fields.items():
+        keys.append(k)
+        values.append(v)
+    insert = "INSERT INTO (%s) VALUES (%s)" % (table, ','.join(keys), ','.join(values))
+    conn = connect()
+    with conn.cursor() as cursor:
+        cursor.execute(insert)
+    conn.commit()
+
 def geneRandCustomers():
     for i in range(100):
          cid = i 
@@ -91,5 +103,3 @@ def creditcards():
             ctype_ = ctype[rand.randint(0,1)]
             InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(i,ccnumber,addr,name,seccode,ctype_,str(month) + "/" + str(day) + "/" + str(yr)))
             
-
-
