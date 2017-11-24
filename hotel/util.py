@@ -20,7 +20,7 @@ def SelectQuery(query:str,x = None,one:bool = True)->dict:
             return cursor.fetchone()
         else:
             return cursor.fetchall()
-def InsertQuery(query:str,x):
+def InsertQuery(query:str, x):
     """
         Makes an INSERT Query
     """
@@ -72,6 +72,7 @@ def genServices():
         howmany = rand.randint(1,7)
         for x in range(0,howmany):
             InsertQuery("INSERT INTO Service VALUES(%s,%s,%s)",(bfarr[x],i,pricesarr[x]))
+
 def creditcards():
     ctype = ['C','D']
     for i in range(100):

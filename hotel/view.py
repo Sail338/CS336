@@ -53,7 +53,7 @@ def dashboard():
 
 @app.route("/search-page", methods=['POST'])
 def search_page():
-    print request.form['search']
+    print(request.form['search'])
     return render_template('search.html')
 
 @app.route("/search", methods=['POST'])
@@ -95,7 +95,7 @@ def account():
     if request.method == 'GET':
         #set variable info = the query that gives us the information of the user given session cookies
         user_id = request.cookies.get('Session')
-        if request.form['submit'] != 'edit'
+        if request.form['submit'] != 'edit':
             if user_id:
                 #info = user information
                 info = {"name":"Sam Azouzi","email":"sazouzi21@gmail.com","phone":"1234567891234"}
@@ -121,8 +121,8 @@ def account():
                  "addr":"98 Woodbridge Lane something something"}
                 ]
                 return render_template('account.html',info=info,credit_list=credit_list)
-        else:
-            #Continue
+        else: # ??
+            pass #Continue 
     else:
         user_id = request.cookies.get('Session')
         if user_id:
