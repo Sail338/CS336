@@ -156,7 +156,7 @@ def get_profile():
 def edit_profile():
     m = hashlib.sha1()
     try:
-        password = m.update(request.form['password'].encode('utf-8').hexdigest()
+        password = m.update(request.form['password'].encode('utf-8').hexdigest())
         update_cards = request.form['cards'] # perform set operation to figure out which cards to add, update, and delete
         existing_cards = [] # getCreditCardsForUser(
         update_card_nos = set([card['card_no'] for card in existing_cards])
@@ -165,7 +165,7 @@ def edit_profile():
         update_cards = update_card_nos & existing_card_nos # update these cards in db
         remove_cards = existing_card_nos - update_card_nos # remove these cards in db
         return "OK"
-    else:
+    except:
         return "ERROR"
 
 @app.route('/browse', methods=['GET'])
