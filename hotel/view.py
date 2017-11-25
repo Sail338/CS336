@@ -143,7 +143,7 @@ def register_account():
         return "200"
     except:
         return "Error: Bad values"
-@app.route('/register', methods=['GET']))
+@app.route('/register', methods=['GET'])
 def register_page():
     # return registration page
     pass
