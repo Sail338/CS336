@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, json, redirect, url_for, make_response
 from hotel import app
-from hotel.util import InsertQuery, InsertQueryKV
+from hotel.util import InsertQuery, InsertQueryKV,SelectQuery
 import hashlib
+
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -64,11 +65,10 @@ def search():
     #IF THERE ARE ANY ERRORS IN THE QUERY, ADD A STRING TO THE ERROR LIST DESCRIBING THE ERROR
     #e.g. "Incorrect Date Format"
     error = []
-    error.append("Error in Data")
-    error.append("Error in country")
     countries = request.form['country']
     print(countries)
     states = request.form['state']
+    states_arr = states.split(",")
     print(states)
     #entry and depart can be delimited by a -
     #NEED TO CHECK ACCURACY OF THIS, IF THE YEAR HAS MORE THAN 4 DIGITS -> Incorrect
@@ -83,13 +83,18 @@ def search():
     services = request.form.getlist('service')
     for x in services:
         print(x)
-    services = request.form.getlist('breakfast')
-    for x in services:
+    breakfasts = request.form.getlist('breakfast')
+    for x in breakfasts:
         print(x)
+    
+    sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s GROUP BY h.Hotelid"
+    results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
+    print(results)
+
+
     if error:
         return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    results = [{"HName":"Sampton","Phone":"9171233377"},{"HName":"Shripton","Phone":"91783821377"},{"HName":"Hemanpton","Phone":"993921377"}]
     return render_template('search.html',result=results)
 
 @app.route("/account_settings", methods=['GET','POST'])

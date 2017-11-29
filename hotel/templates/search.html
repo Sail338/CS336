@@ -49,8 +49,8 @@
     </form>
     {% if result %}
       {% for hotel in result %}
-        <li>Hotel Name: {{hotel['HName']}}</li>
-        <li>Hotel Phone Number: {{hotel['Phone']}} </li>
+        <li>Hotel Name: {{hotel['HotelId']}}</li>
+        <li>Hotel Phone Number: {{hotel['PhoneNo']}} </li>
       {% endfor %}
     {% endif %}
   </body>
