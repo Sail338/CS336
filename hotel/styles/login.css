@@ -1,0 +1,13 @@
+.header-image {
+    background-image: url(../photos/loginPic.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #999;
+}
+.login {
+  max-height: 640px;
+  max-width: 640px;
+  margin:auto;
+}
