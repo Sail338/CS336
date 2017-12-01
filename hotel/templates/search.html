@@ -28,28 +28,33 @@
         <br><br>
         <fieldset>
         <legend>Please select Services you want:</legend>
-        <input type="checkbox" name="service" value="Service 1">Service 1<br>
-        <input type="checkbox" name="service" value="Service 2">Service 2<br>
-        <input type="checkbox" name="service" value="Service 3">Service 3<br>
-        <input type="checkbox" name="service" value="Service 4">Service 4<br>
-        <input type="checkbox" name="service" value="Service 5">Service 5<br>
+        <input type="checkbox" name="service" value="Casino">Casino<br>
+        <input type="checkbox" name="service" value="Coference rooom">Conference Room<br>
+        <input type="checkbox" name="service" value="Gym">Gym<br>
+        <input type="checkbox" name="service" value="Pool">Pool<br>
+        <input type="checkbox" name="service" value="Jaqcuuzi">Jaqcuuzi<br>
+		<input type ="checkbox" name = "service" value = "Maid">Maid<br>
+		<input type = "checkbox" name = "service" value = "Track">Track<br>
         <br>
         </fieldset>
         <br><br>
         <fieldset>
         <legend>Please select Breakfasts you want:</legend>
-        <input type="checkbox" name="breakfast" value="Breakfast 1">Breakfast 1<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 2">Breakfast 2<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 3">Breakfast 3<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 4">Breakfast 4<br>
-        <input type="checkbox" name="breakfast" value="Breakfast 5">Breakfast 5<br>
+        <input type="checkbox" name="breakfast" value="American">American<br>
+        <input type="checkbox" name="breakfast" value='Contential'>Contential<br>
+        <input type="checkbox" name="breakfast" value="English">English<br>
+        <input type="checkbox" name="breakfast" value="French">French<br>
+        <input type="checkbox" name="breakfast" value="Indian">Indian<br>
+        <input type="checkbox" name="breakfast" value="Italian">Italian<br>
+        <input type="checkbox" name="breakfast" value="Mexican">Mexican<br>
+
         <br>
         </fieldset>
         <button type="submit">Search</button>
     </form>
     {% if result %}
       {% for hotel in result %}
-        <li>Hotel Name: {{hotel['HotelId']}}</li>
+	  <li>Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}}</li>
         <li>Hotel Phone Number: {{hotel['PhoneNo']}} </li>
       {% endfor %}
     {% endif %}
