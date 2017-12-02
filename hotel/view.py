@@ -87,7 +87,7 @@ def search():
     for x in breakfasts:
         print(x)
     results = None 
-    sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s  and r.roomno NOT in GROUP BY h.Hotelid"
+    sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s GROUP BY h.Hotelid"
     if services !=  [] and breakfasts != []:
         print (services)
         
