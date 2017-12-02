@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+        <h2>{{hotelInfo["address"]}}</h2>
+        <h3>{{hotelInfo["phone"]}}</h3>
+        <h5>{{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}</h5>
+        <h5>Minimum: {{hotelInfo["min"]}} - {{hotelInfo["max"]}} </h5>
+        <h5>Breakfast Options</h5>
+        {% for b in hotelInfo["breakfast"] %}
+            <li> {{b}} </li>
+        {% endfor %}
+        <h5>Service Options</h5>
+        {% for s in hotelInfo["service"] %}
+            <li> {{s}} </li>
+        {% endfor %}
+        <br><br><br>
+        {% for room in hotelInfo["room"] %}
+            <h3>Room Number: {{room['roomno']}}</h3>
+            <h3>Floor: {{room['floor']}}</h3>
+            <h3>Room Price Per Night: {{room['price']}}</h3>
+            <h3>Room Capacity: {{room['cap']}}</h3>
+            <h3>Room Description: {{room['desc']}}</h3>
+        {% endfor %}
+
+  </body>
+</html>

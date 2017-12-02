@@ -56,7 +56,7 @@
 	<form action="/hotel-page" method="POST">
       {% for hotel in result %}
 	   Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}} <br>
-	   Hotel Phone Number: {{hotel['PhoneNo']}} <br> <button name='hotel' type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}}' > Click Here </button>
+	   Hotel Phone Number: {{hotel['PhoneNo']}} <br> <button name='hotel' type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}' > Click Here </button>
       {% endfor %}
 	</form>
     {% endif %}

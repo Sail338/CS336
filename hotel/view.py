@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, json, redirect, url_for, make_response
+from flask import Flask, render_template, request, json, redirect, url_for, make_response,jsonify
 from hotel import app
 from hotel.util import InsertQuery, InsertQueryKV,SelectQuery
 import hashlib
+import json as js
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -116,7 +117,7 @@ def search():
     if error:
         return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    return render_template('search.html',result=results,form_data= request.form.to_dict())
+    return render_template('search.html',result=results,form_data= js.dumps(request.form.to_dict()))
 
 @app.route("/account_settings", methods=['GET','POST'])
 def account():
@@ -200,8 +201,14 @@ def browse():
 
 @app.route('/hotel-page', methods=['POST'])
 def hotel_page():
-    val = json.loads(json.loads(json.dumps(request.form['hotel'])))
-    return val
+    val = json.loads(request.form['hotel'])
+    #return (val['results']['country'])
+    hotelInfo = {}
+    hotelid = val["id"]
+    sql = "SELECT * FROM Hotel h WHERE h.HotelId=(%s)"
+    results = SelectQuery(sql,(hotelid),one = False)
+
+    return render_template('hotel-page', hotelInfo=hotelInfo)
 
 @app.route('/reserve', methods=['POST'])
 def reserve():
