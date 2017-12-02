@@ -72,16 +72,20 @@ def search():
     #entry and depart can be delimited by a -
     #NEED TO CHECK ACCURACY OF THIS, IF THE YEAR HAS MORE THAN 4 DIGITS -> Incorrect
     entry = request.form['entry']
+
+    val = request.form.to_dict()
     print(entry)
     depart = request.form['depart']
     print(depart)
     minCost = request.form['min']
     if minCost == "" or minCost == None:
         minCost = 0
+        val['min'] = 0   
     print(minCost)
     maxCost = request.form['max']
     if maxCost == "" or maxCost == None:
         maxCost = 999
+        val['max'] = 0
     print(maxCost)
     services = request.form.getlist('service')
     for x in services:
@@ -91,7 +95,6 @@ def search():
         print(x)
     results = None
 
-    val = request.form.to_dict()
     val["services"] = services
     val["breakfasts"] = breakfasts
     sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s GROUP BY h.Hotelid"
