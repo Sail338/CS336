@@ -202,8 +202,13 @@ def browse():
 @app.route('/hotel-page', methods=['POST'])
 def hotel_page():
     val = json.loads(request.form['hotel'])
-    print (val['id'])
-    return "Sri"
+    #return (val['results']['country'])
+    hotelInfo = {}
+    hotelid = val["id"]
+    sql = "SELECT * FROM Hotel h WHERE h.HotelId=(%s)"
+    results = SelectQuery(sql,(hotelid),one = False)
+
+    return render_template('hotel-page', hotelInfo=hotelInfo)
 
 @app.route('/reserve', methods=['POST'])
 def reserve():
