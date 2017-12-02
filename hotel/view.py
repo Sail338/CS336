@@ -86,11 +86,14 @@ def search():
     services = request.form.getlist('service')
     for x in services:
         print(x)
-
     breakfasts = request.form.getlist('breakfast')
     for x in breakfasts:
         print(x)
     results = None
+
+    val = request.form.to_dict()
+    val["services"] = services
+    val["breakfasts"] = breakfasts
     sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s GROUP BY h.Hotelid"
     if services !=  [] and breakfasts != []:
         sqlst = buildQueryServiceBreakfasts(services,breakfasts)
@@ -100,10 +103,9 @@ def search():
 
 
     elif services:
-        serv = ""
 
-        sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId INNER JOIN Service s on h.Hotelid = s.Hotelid WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s AND s.Stype in %s GROUP BY h.Hotelid"
-        results = SelectQuery(sqlst,(countries,states,minCost,maxCost,services),one= False)
+        sqlst = buildQuerySerices(services) 
+        results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
         
     elif breakfasts:
         sqlst = buildQueryBreakfasts(breakfasts)
@@ -117,7 +119,7 @@ def search():
     if error:
         return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    return render_template('search.html',result=results,form_data= js.dumps(request.form.to_dict()))
+    return render_template('search.html',result=results,form_data= js.dumps(val))
 
 @app.route("/account_settings", methods=['GET','POST'])
 def account():

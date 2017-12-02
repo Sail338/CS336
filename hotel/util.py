@@ -116,8 +116,9 @@ def buildQuerySerices(slist):
     base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s" 
 
     for i in slist:
-        base += " AND EXISTS (SELECT h1.hotelID FROM Room r , Serivce s WHERE r.HotelId = h1.HotelId and h1.Hotelid = s.Hotelid AND '" + str(i)+ "' " +  " = s.Stype)"
+        base += " AND EXISTS (SELECT h1.hotelID FROM Room r , Service s WHERE r.HotelId = h1.HotelId and h1.Hotelid = s.Hotelid AND '" + str(i)+ "' " +  " = s.Stype)"
     base += "GROUP BY h1.hotelid"
+    print (base)
     return base
 
 def buildQueryServiceBreakfasts(slist,blist):
