@@ -200,8 +200,7 @@ def browse():
 
 @app.route('/hotel-page', methods=['POST'])
 def hotel_page():
-    val = json.loads(json.dumps(request.form['hotel']))
-    print(type(val))
+    val = json.loads(json.loads(json.dumps(request.form['hotel'])))
     return val
 
 @app.route('/reserve', methods=['POST'])
