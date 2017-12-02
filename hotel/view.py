@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, json, redirect, url_for, make
 from hotel import app
 from hotel.util import InsertQuery, InsertQueryKV,SelectQuery
 import hashlib
-
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -90,17 +89,17 @@ def search():
     breakfasts = request.form.getlist('breakfast')
     for x in breakfasts:
         print(x)
-    results = None 
+    results = None
     sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s GROUP BY h.Hotelid"
     if services !=  [] and breakfasts != []:
         print (services)
-        
+
         sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId INNER JOIN Service s on h.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h.hotelid = b.hotelid  WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s AND s.Stype in %s and b.Btype in %s GROUP BY h.Hotelid"
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost,services,breakfasts),one= False)
 
     elif services:
         serv = ""
-    
+
         sqlst = "SELECT * FROM Room r INNER JOIN Hotel h on h.HotelId = r.HotelId INNER JOIN Service s on h.Hotelid = s.Hotelid WHERE h.Country IN (%s) and h.state IN (%s) AND r.price >%s and r.price <%s AND s.Stype in %s GROUP BY h.Hotelid"
         print (sqlst)
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost,services),one= False)
@@ -117,7 +116,7 @@ def search():
     if error:
         return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    return render_template('search.html',result=results,form_data= request.form)
+    return render_template('search.html',result=results,form_data= request.form.to_dict())
 
 @app.route("/account_settings", methods=['GET','POST'])
 def account():
@@ -151,7 +150,7 @@ def account():
                 ]
                 return render_template('account.html',info=info,credit_list=credit_list)
         else: # ??
-            pass #Continue 
+            pass #Continue
     else:
         user_id = request.cookies.get('Session')
         if user_id:
@@ -198,6 +197,12 @@ def edit_profile():
 @app.route('/browse', methods=['GET'])
 def browse():
     pass
+
+@app.route('/hotel-page', methods=['POST'])
+def hotel_page():
+    val = json.loads(json.dumps(request.form['hotel']))
+    print(type(val))
+    return val
 
 @app.route('/reserve', methods=['POST'])
 def reserve():

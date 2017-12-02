@@ -51,12 +51,12 @@
         <br>
         </fieldset>
         <button type="submit">Search</button>
-	<form>
+	</form>
     {% if result %}
-	<form>
+	<form action="/hotel-page" method="POST">
       {% for hotel in result %}
-	   Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}} <br> 
-	   Hotel Phone Number: {{hotel['PhoneNo']}} <br> <button type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}}' > Click Here </button>
+	   Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}} <br>
+	   Hotel Phone Number: {{hotel['PhoneNo']}} <br> <button name='hotel' type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}}' > Click Here </button>
       {% endfor %}
 	</form>
     {% endif %}
