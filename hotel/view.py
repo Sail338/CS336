@@ -76,7 +76,7 @@ def search():
     depart = request.form['depart']
     print(depart)
     minCost = request.form['min']
-    if minCost = "" or minCost == None:
+    if minCost == "" or minCost == None:
         minCost = 0
     print(minCost)
     maxCost = request.form['max']
