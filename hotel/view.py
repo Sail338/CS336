@@ -80,7 +80,7 @@ def search():
         minCost = 0
     print(minCost)
     maxCost = request.form['max']
-    if maxCost == "" oor maxCost == None:
+    if maxCost == "" or maxCost == None:
         maxCost = 999
     print(maxCost)
     services = request.form.getlist('service')
