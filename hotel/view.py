@@ -76,8 +76,12 @@ def search():
     depart = request.form['depart']
     print(depart)
     minCost = request.form['min']
+    if minCost = "" or minCost == None:
+        minCost = 0
     print(minCost)
     maxCost = request.form['max']
+    if maxCost = "" oor maxCost == None:
+        maxCost = 999
     print(maxCost)
     services = request.form.getlist('service')
     for x in services:
@@ -113,7 +117,7 @@ def search():
     if error:
         return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    return render_template('search.html',result=results)
+    return render_template('search.html',result=results,form_data= request.form)
 
 @app.route("/account_settings", methods=['GET','POST'])
 def account():
