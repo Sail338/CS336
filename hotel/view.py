@@ -38,9 +38,23 @@ def logoff():
         response.set_cookie('Session','',expires=0)
         return response
 
+'''
+------------------------------------------------------------------------------------------
+------------------------------------ SQL QUERIES USED ------------------------------------
+------------------------------------------------------------------------------------------
+(In order)
 
-@app.route("/dashboard")
+SELECT Name From Customer WHERE Email = email;
+SELECT * FROM Reservation WHERE Cid IN (SELECT Cid FROM Customer WHERE Email = email); (Reservation)
+SELECT * FROM Reserves WHERE InvoiceNo IN (Reservation.InvoiceNo);
+SELECT * FROM Service WHERE HotelId IN (Reservation.HotelId);
+SELECT * FROM Hotel WHERE HotelId IN (Reservation.HotelID);
+'''
+@app.route("/dashboard", methods=['GET'])
 def dashboard():
+    email = request.args.get('email')
+    return render_template('dashboard.html', user=user)
+    '''
     user_id = request.cookies.get('Session')
     if user_id:
         #The if statement below would check if the cookie containeed is in the database,
@@ -52,7 +66,7 @@ def dashboard():
             user = {"Name": "Sam Azouzi","Age":20}
             return render_template('dashboard.html', user=user)
     else:
-        return redirect(url_for('home'))
+        return redirect(url_for('home'))'''
 
 @app.route("/search-page", methods=['POST'])
 def search_page():

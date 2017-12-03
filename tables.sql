@@ -37,21 +37,21 @@ CREATE TABLE IF NOT EXISTS Review (
         FOREIGN KEY (Cid) REFERENCES Customer(Cid)
 );
 CREATE TABLE IF NOT EXISTS RoomReview (
-ReviewId INTEGER PRIMARY KEY,
-RoomNo INTEGER,
-FOREIGN KEY (ReviewId) REFERENCES Review(ReviewId),
-FOREIGN KEY (RoomNo) REFERENCES Room(RoomNo)
+        ReviewId INTEGER PRIMARY KEY,
+        RoomNo INTEGER,
+        FOREIGN KEY (ReviewId) REFERENCES Review(ReviewId),
+        FOREIGN KEY (RoomNo) REFERENCES Room(RoomNo)
 );
 CREATE TABLE IF NOT EXISTS BreakfastReview (
-ReviewId INTEGER PRIMARY KEY,
-BType VARCHAR(255),
-FOREIGN KEY (ReviewId) REFERENCES Review(ReviewId),
+        ReviewId INTEGER PRIMARY KEY,
+        BType VARCHAR(255),
+        FOREIGN KEY (ReviewId) REFERENCES Review(ReviewId),
         FOREIGN KEY (BType) REFERENCES Breakfast(BType)
 );
 CREATE TABLE IF NOT EXISTS ServiceReview (
-ReviewId INTEGER PRIMARY KEY,
-SType VARCHAR(255),
-FOREIGN KEY (ReviewId) REFERENCES Review(ReviewId),
+        ReviewId INTEGER PRIMARY KEY,
+        SType VARCHAR(255),
+        FOREIGN KEY (ReviewId) REFERENCES Review(ReviewId),
         FOREIGN KEY (SType) REFERENCES Service(BType)
 );
 CREATE TABLE IF NOT EXISTS Customer(
@@ -78,16 +78,17 @@ CREATE TABLE IF NOT EXISTS Reservation (
         InvoiceNo INTEGER PRIMARY KEY,
         Cid INTEGER,
         ResDate  datetime,
-HotelId INTEGER,
+        HotelId INTEGER,
         TotalAmt FLOAT,
-FOREIGN KEY (Cid) REFERENCES CustomerReservationXRef(Cid),
+        FOREIGN KEY (Cid) REFERENCES CustomerReservationXRef(Cid),
         FOREIGN KEY (HotelId) REFERENCES Hotel(HotelId)
 );
 
 
 CREATE TABLE IF NOT EXISTS CustomerReservationXRef(
         Cid INTEGER,
-        InvoiceNo INTEGER PRIMARY KEY
+        InvoiceNo INTEGER,
+        PRIMARY KEY (Cid,InvoiceNo)
 );
 
 
@@ -97,8 +98,11 @@ CREATE TABLE IF NOT EXISTS Reserves (
         InDate  datetime,
         RoomNo INTEGER,
         NoOfDays INTEGER,
+        HotelId INTEGER,
+        PRIMARY KEY (InvoiceNo,RoomNo,HotelId),
         FOREIGN KEY (InvoiceNo) REFERENCES Reservation(InvoiceNo),
-        FOREIGN KEY (RoomNo) REFERENCES Room(RoomNo)
+        FOREIGN KEY (RoomNo) REFERENCES Room(RoomNo),
+        FOREIGN KEY (HotelId) REFERENCES Hotel(HotelId)
 );
 CREATE TABLE IF NOT EXISTS Room  (
         RoomNo INTEGER,
