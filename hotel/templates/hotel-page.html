@@ -8,7 +8,7 @@
         <h2>{{hotelInfo["address"]}}</h2>
         <h3>{{hotelInfo["phone"]}}</h3>
         <h5>{{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}</h5>
-        <h5>Minimum: {{hotelInfo["min"]}} - {{hotelInfo["max"]}} </h5>
+        <h5>Room Minimum: ${{hotelInfo["min"]}} - Room Maximum: ${{hotelInfo["max"]}} </h5>
         <h5>Breakfast Options</h5>
         {% for b in hotelInfo["breakfast"] %}
             <li> {{b}} </li>
@@ -18,13 +18,23 @@
             <li> {{s}} </li>
         {% endfor %}
         <br><br><br>
-        {% for room in hotelInfo["room"] %}
-            <h3>Room Number: {{room['roomno']}}</h3>
-            <h3>Floor: {{room['floor']}}</h3>
-            <h3>Room Price Per Night: {{room['price']}}</h3>
-            <h3>Room Capacity: {{room['cap']}}</h3>
-            <h3>Room Description: {{room['desc']}}</h3>
-        {% endfor %}
+        {% if hotelInfo["rooms"]|length == 0 %}
+            <p>No Rooms with open space, please try again at a later date!</p>
+        {% else %}
+            {% for room in hotelInfo["rooms"] %}
+                <br>
+                <h4>Room Number: {{room['RoomNo']}}</h4>
+                {% if room['Discount'] != 0 %}
+                  <p>This Room has a discount of {{room["Discount"]}}%!</p>
+                {% endif %}
+                <ul>Floor: {{room['FloorNo']}}</ul>
+                <ul>Room Price Per Night: {{room['Price']}}</ul>
+                <ul>Room Capacity: {{room['Capacity']}}</ul>
+                <ul>Room Description: {{room['Description']}}</ul>
+                <br>
+            {% endfor %}
+        {% endif %}
+
 
   </body>
 </html>

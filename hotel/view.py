@@ -80,7 +80,7 @@ def search():
     minCost = request.form['min']
     if minCost == "" or minCost == None:
         minCost = 0
-        val['min'] = 0   
+        val['min'] = 0
     print(minCost)
     maxCost = request.form['max']
     if maxCost == "" or maxCost == None:
@@ -91,6 +91,7 @@ def search():
     for x in services:
         print(x)
     breakfasts = request.form.getlist('breakfast')
+
     for x in breakfasts:
         print(x)
     results = None
@@ -107,9 +108,9 @@ def search():
 
     elif services:
 
-        sqlst = buildQuerySerices(services) 
+        sqlst = buildQuerySerices(services)
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
-        
+
     elif breakfasts:
         sqlst = buildQueryBreakfasts(breakfasts)
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
@@ -208,12 +209,43 @@ def browse():
 def hotel_page():
     val = json.loads(request.form['hotel'])
     #return (val['results']['country'])
+    entry = val["results"]["entry"]
+    depart = val["results"]["depart"]
+    sqlst = "SELECT * FROM Room r1  WHERE r1.HotelId = %s AND r1.price >%s and r1.price <%s AND NOT EXISTS (SELECT * FROM Reserves res WHERE res.HotelID = r1.HotelID and res.RoomNo = r1.RoomNo and %s between res.InDate and res.OutDate and %s between res.InDate and res.OutDate) "
+    results = SelectQuery(sqlst,(val["id"],val["results"]["min"],val["results"]["max"],entry,depart),one= False)
+    sqlst = "SELECT *,o.Discount as dis FROM Room r1, Offerroom o WHERE r1.HotelId = %s and r1.price >%s and r1.price <%s AND NOT EXISTS (SELECT * FROM Reserves res WHERE res.HotelID = r1.HotelID and res.RoomNo = r1.RoomNo and %s between res.InDate and res.OutDate and %s between res.InDate and res.OutDate) and r1.HotelId = o.HotelId and r1.RoomNo = o.RoomNo  and %s between o.SDate and o.EDate and %s between o.SDate and o.EDate"
+    results2 = SelectQuery(sqlst,(val["id"],val["results"]["min"],val["results"]["max"],entry,depart,entry,depart),one= False)
+    if len(results2) == 0:
+        for i in range(0,len(results)):
+            results[i]["Discount"] = 0
+    else:
+        for i in range(0,len(results)):
+            results[i]["Discount"] = 0
+            for y in range(0,len(results2)):
+                if results[i]["RoomNo"] == results2[y]["RoomNo"]:
+                    print(results2[y]["dis"])
+                    print(i)
+                    results[i]["Discount"] = results2[y]["dis"] * 100
+                    break
+                else:
+                    results[i]["Discount"] = 0
+
     hotelInfo = {}
     hotelid = val["id"]
+    hotelInfo['breakfast'] = val["results"]["breakfasts"]
+    hotelInfo['service'] = val["results"]["services"]
+    hotelInfo["rooms"] = results
+    minVal = int(val["results"]["min"])
+    maxVal = int(val["results"]["max"])
     sql = "SELECT * FROM Hotel h WHERE h.HotelId=(%s)"
-    results = SelectQuery(sql,(hotelid),one = False)
-
-    return render_template('hotel-page', hotelInfo=hotelInfo)
+    results = SelectQuery(sql,(hotelid))
+    hotelInfo['address'] = results["Street"] +" "+results["State"] +" "+ results["City"] +" "+ str(results["Zip"]) +" "+ results["Country"]
+    hotelInfo["phone"] = results["PhoneNo"]
+    hotelInfo["min"] = minVal
+    hotelInfo["max"] = maxVal
+    hotelInfo["entry"] = entry
+    hotelInfo["depart"] = depart
+    return render_template('hotel-page.html', hotelInfo=hotelInfo)
 
 @app.route('/reserve', methods=['POST'])
 def reserve():
