@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, json, redirect, url_for, make_response,jsonify
+from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from hotel import app
-from hotel.util import InsertQuery, InsertQueryKV,SelectQuery,buildQueryBreakfasts,buildQuerySerices,buildQueryServiceBreakfasts
+from hotel.util import InsertQuery, InsertQueryKV, SelectQuery, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
 import hashlib
-import json as js
+import json
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -137,7 +137,7 @@ def search():
     if error:
         return render_template('search.html',error=error,length=len(error))
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
-    return render_template('search.html',result=results,form_data= js.dumps(val))
+    return render_template('search.html',result=results,form_data= json.dumps(val))
 
 @app.route("/account_settings", methods=['GET','POST'])
 def account():
