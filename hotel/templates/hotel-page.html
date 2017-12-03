@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+        <h2>{{hotelInfo["address"]}}</h2>
+        <h3>{{hotelInfo["phone"]}}</h3>
+        <h5>{{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}</h5>
+        <h5>Room Minimum: ${{hotelInfo["min"]}} - Room Maximum: ${{hotelInfo["max"]}} </h5>
+        <h5>Breakfast Options</h5>
+        {% for b in hotelInfo["breakfast"] %}
+            <li> {{b}} </li>
+        {% endfor %}
+        <h5>Service Options</h5>
+        {% for s in hotelInfo["service"] %}
+            <li> {{s}} </li>
+        {% endfor %}
+        <br><br><br>
+        {% if hotelInfo["rooms"]|length == 0 %}
+            <p>No Rooms with open space, please try again at a later date!</p>
+        {% else %}
+            {% for room in hotelInfo["rooms"] %}
+                <br>
+                <h4>Room Number: {{room['RoomNo']}}</h4>
+                {% if room['Discount'] != 0 %}
+                  <p>This Room has a discount of {{room["Discount"]}}%!</p>
+                {% endif %}
+                <ul>Floor: {{room['FloorNo']}}</ul>
+                <ul>Room Price Per Night: {{room['Price']}}</ul>
+                <ul>Room Capacity: {{room['Capacity']}}</ul>
+                <ul>Room Description: {{room['Description']}}</ul>
+                <br>
+            {% endfor %}
+        {% endif %}
+
+
+  </body>
+</html>
