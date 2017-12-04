@@ -250,8 +250,8 @@
 	<form action="/hotel-page" method="POST">
       {% for hotel in result %}
       <div class="box has-text-centered">
-	   <p>Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}}</p>
-	   Hotel Phone Number: {{hotel['PhoneNo']}} <br> <button name='hotel' type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}' > Click Here </button>
+	   <p><b>Hotel Address:</b> {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}}</p>
+	   <p><b>Hotel Phone Number:</b> {{hotel['PhoneNo']}}</p> <br> <button class="button" name='hotel' type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}' > Click Here </button>
        </div>
       {% endfor %}
 	</form>
