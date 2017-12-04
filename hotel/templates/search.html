@@ -2,10 +2,201 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Search</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/search.css') }}">
   </head>
   <body>
-    {% if error and length != 0 %}
+
+  <section class="hero is-dark is-fullheight header-image">
+
+    <div class="hero-head">
+      <nav class="navbar">
+        <div class="container">
+
+          <div id="navbarMenuHeroA" class="navbar-menu">
+            <div class="navbar-end">
+              <a href="account.html" class="navbar-item">
+                Profile
+              </a>
+              <a href="dashboard.html" class="navbar-item">
+                Dashboard
+              </a>
+              <a href='/search-page' class="navbar-item">
+                Search
+              </a>
+              <a href="checkout.html" class="navbar-item">
+                Checkout
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title is-large">
+          Search
+        </h1>
+        <h2 class="subtitle">
+          Powered by Rayatt
+        </h2>
+        <div class="box has-text-centered search">
+            <form class="has-text-centered" action="/search" method="POST">
+
+                {% if error and length != 0 %}
+                <h3>There was an error with your query, check your:</h3>
+                {% for e in error %}
+                <li>{{e}}</li>
+                {% endfor %}
+                {% endif %}
+
+                <div class="field">
+                    <label class="label">Countries</label>
+                    <div class="control">
+                      <input class="input is-success" name="country" type="text" placeholder="For more than 1 country, put a comma between each new country">
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label class="label">States</label>
+                    <div class="control">
+                      <input class="input" name="state" type="text" placeholder="For more than 1 state, put a comma between each new state">
+                    </div>
+                  </div>
+                  <br>
+                <div class="field is-grouped is-grouped-centered">
+                    <label class="label leftLabel" >Check-In Date</label>
+                    <div class="control">
+                      <input class="input" name="entry" type="date">
+                    </div>
+                    <label class="label rightLabel">Check-Out Date</label>
+                    <div class="control">
+                      <input class="input" name="depart" type="date">
+                    </div>
+                </div>
+                <br>
+                <div class="field is-grouped is-grouped-centered">
+                    <label class="label leftLabel">Minimum Cost</label>
+                    <div class="control">
+                      <input class="input" name="min" type="text">
+                    </div>
+                    <label class="label rightLabel">Maximum Cost</label>
+                    <div class="control">
+                      <input class="input" name="max" type="text">
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="field is-grouped is-grouped-centered">
+                    <fieldset>
+
+                        <h4 class="title is-4" style="color:#363636;">Select the Services you want</h4>
+                        
+                        <div class="control has-text-centered">
+                            <label class="label">Casino
+                                <input type="checkbox" name="service" value="Casino"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                        <label class="label">Conference Room
+                            <input type="checkbox" name="service" value="Coference rooom"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Gym
+                                <input type="checkbox" name="service" value="Gym"></label>
+                        </div>
+                        
+                        <div class="control has-text-centered">
+                            <label class="label">Pool
+                                <input type="checkbox" name="service" value="Pool"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Jacuzzi
+                                <input type="checkbox" name="service" value="Jaqcuuzi"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Room Service Maid
+                                <input type="checkbox" name="service" value="Maid"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Track
+                                <input type="checkbox" name="service" value="Track"></label>
+                        </div>
+                    </fieldset>
+                </div>
+                
+                <br>
+
+                <div class="field is-grouped is-grouped-centered">
+                    <fieldset>
+
+                        <h4 class="title is-4" style="color:#363636;">Select the Breakfasts you want</h4>
+                        
+                        <div class="control has-text-centered">
+                            <label class="label">American
+                                <input type="checkbox" name="breakfast" value="American"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                        <label class="label">Continental
+                            <input type="checkbox" name="breakfast" value="Contential"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">English
+                                <input type="checkbox" name="breakfast" value="English"></label>
+                        </div>
+                        
+                        <div class="control has-text-centered">
+                            <label class="label">French
+                                <input type="checkbox" name="breakfast" value="French"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Indian
+                                <input type="checkbox" name="breakfast" value="Indian"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Italian
+                                <input type="checkbox" name="breakfast" value="Italian"></label>
+                        </div>
+
+                        <div class="control has-text-centered">
+                            <label class="label">Mexican
+                                <input type="checkbox" name="breakfast" value="Mexican"></label>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <br>
+
+                <div class="field is-grouped is-grouped-centered">
+                    <div class="control">
+                      <button class="button is-link">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        
+      </div>
+    </div>
+
+  </section>
+
+<!--     {% if error and length != 0 %}
       <h3>There was an error with your query, check your:</h3>
       {% for e in error %}
         <li>{{e}}</li>
@@ -51,14 +242,23 @@
         <br>
         </fieldset>
         <button type="submit">Search</button>
-	</form>
+	</form> -->
+
     {% if result %}
+    <div class="container has-text-centered">
+    <h3 class="title is-3 results">Results</h3>
 	<form action="/hotel-page" method="POST">
       {% for hotel in result %}
-	   Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}} <br>
+      <div class="box has-text-centered">
+	   <p>Hotel Address: {{hotel['Street']}}   {{hotel['City']}}  {{hotel['State']}}  {{hotel['Zip']}}</p>
 	   Hotel Phone Number: {{hotel['PhoneNo']}} <br> <button name='hotel' type = 'submit' value = '{ "id": {{hotel['HotelId']}}, "results":{{form_data}}}' > Click Here </button>
+       </div>
       {% endfor %}
 	</form>
     {% endif %}
+    </div>
   </body>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 </html>
