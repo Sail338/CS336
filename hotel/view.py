@@ -353,10 +353,10 @@ def checkout():
                 results["discount"] = results['Price'] * (discount/100)
                 results["entry"] = entry
                 results["depart"] = depart
-            sql = "SELECT b.BType FROM Breakfast b WHERE b.HotelId = %s"
+            sql = "SELECT BType, Bprice FROM Breakfast WHERE Breakfast.HotelId = %s"
             re = SelectQuery(sql,(hotelid),one=False)
             results["breakfasts"] = re
-            sql = "SELECT s.SType FROM Service s WHERE s.HotelId = %s"
+            sql = "SELECT SType, SCost FROM Service WHERE Service.HotelId = %s"
             re = SelectQuery(sql,(hotelid),one=False)
             results["services"] = re
 
