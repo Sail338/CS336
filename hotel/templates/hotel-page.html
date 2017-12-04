@@ -11,16 +11,18 @@
         <h5>Room Minimum: ${{hotelInfo["min"]}} - Room Maximum: ${{hotelInfo["max"]}} </h5>
         <h5>Breakfast Options</h5>
         {% for b in hotelInfo["breakfast"] %}
-            <li> {{b}} </li>
+            <li> {{b[0]}} at ${{b[1]}} </li>
         {% endfor %}
         <h5>Service Options</h5>
         {% for s in hotelInfo["service"] %}
-            <li> {{s}} </li>
+            <li> {{s[0]}} at ${{s[1]}} </li>
         {% endfor %}
+        <h5>REMINDER: The Amount of Breakfast Options Per Room will be specified during checkout!<h5>
         <br><br><br>
         {% if hotelInfo["rooms"]|length == 0 %}
             <p>No Rooms with open space, please try again at a later date!</p>
         {% else %}
+        <form action="/add_checkout" method="POST">
             {% for room in hotelInfo["rooms"] %}
                 <br>
                 <h4>Room Number: {{room['RoomNo']}}</h4>
@@ -31,8 +33,16 @@
                 <ul>Room Price Per Night: {{room['Price']}}</ul>
                 <ul>Room Capacity: {{room['Capacity']}}</ul>
                 <ul>Room Description: {{room['Description']}}</ul>
+                {% if room['Discount'] != 0 %}
+                  <input type="checkbox" name="add_check" value='{"id":{{hotelInfo['id']}},"roomNo":{{room['RoomNo']}},"entry":"{{hotelInfo['entry']}}","depart":"{{hotelInfo['depart']}}","discount":{{room['Discount']}}}'>Add To Checkout<br>
+                {% else %}
+                  <input type="checkbox" name="add_check" value='{"id":{{hotelInfo['id']}},"roomNo":{{room['RoomNo']}},"entry":"{{hotelInfo['entry']}}","depart":"{{hotelInfo['depart']}}","discount":0}'>Add To Checkout<br>
+                {% endif %}
+
                 <br>
             {% endfor %}
+            <button type="submit">Checkout</button>
+        </form>
         {% endif %}
 
 

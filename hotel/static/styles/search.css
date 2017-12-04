@@ -1,0 +1,27 @@
+.leftLabel {
+	padding-right: 20px;
+}
+.rightLabel {
+	padding-left:20px; 
+	padding-right: 20px;
+}
+fieldset {
+	border-width: 0px;
+}
+
+.search{
+	max-width: 640px;
+	margin:auto;
+}
+.results {
+	margin-top: 30px;
+}
+
+.header-image {
+    background-image: url(../photos/searchPic.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #999;
+}

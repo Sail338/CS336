@@ -24,7 +24,8 @@ def authorize_credentials():
         #if username
         #So if there is a Session cookie then we can assume that the user already logged in
         #Otherwise they did not
-        response.set_cookie('Session', username)
+        #This will contain checkout information as well
+        response.set_cookie('Session', userid)
         return response
     else:
         print("Incorrect Information Given")
@@ -103,7 +104,7 @@ def search():
     maxCost = request.form['max']
     if maxCost == "" or maxCost == None:
         maxCost = 999
-        val['max'] = 0
+        val['max'] = 999
     print(maxCost)
     services = request.form.getlist('service')
     for x in services:
@@ -248,11 +249,53 @@ def hotel_page():
                 else:
                     results[i]["Discount"] = 0
 
+
+
     hotelInfo = {}
-    hotelid = val["id"]
-    hotelInfo['breakfast'] = val["results"]["breakfasts"]
-    hotelInfo['service'] = val["results"]["services"]
+    for x in range(len(results)):
+        sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, RoomReview ro WHERE ro.ReviewId = re.ReviewId and ro.RoomNo = %s and re.HotelId = %s"
+        re = SelectQuery(sql,(results[x]["RoomNo"],val["id"]),one=False)
+        results[x]["Reviews"] = re;
     hotelInfo["rooms"] = results
+    hotelid = val["id"]
+    sql = "SELECT BPrice as b FROM Breakfast WHERE Breakfast.HotelId = %s"
+    results = SelectQuery(sql,(hotelid),one=False)
+    breakfastTuple = []
+    for x in range(len(val["results"]["breakfasts"])):
+        breakfastTuple.append((val["results"]["breakfasts"][x],results[x]["b"]))
+    #hotelInfo['breakfast'] = val["results"]["breakfasts"]
+    hotelInfo['breakfast'] = breakfastTuple
+
+
+    sql = "SELECT BType From Breakfast Where hotelId = %s"
+    results = SelectQuery(sql,(hotelid),one=False)
+    breakfastReviewList = []
+    for x in range(len(results)):
+        sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, BreakfastReview br WHERE re.ReviewId = br.ReviewId and br.HotelId = %s and br.BType = %s"
+        re = SelectQuery(sql,(hotelid,results[x]["BType"]),one=False)
+        breakfastReviewList.append((results[x]["BType"],re))
+
+    hotelInfo["breakfastReviews"] = breakfastReviewList
+    sql = "SELECT SCost as s FROM Service WHERE Service.HotelId = %s"
+    results = SelectQuery(sql,(hotelid), one=False)
+    serviceTuple = []
+    for x in range(len(val["results"]["services"])):
+        serviceTuple.append((val["results"]["services"][x],results[x]["s"]))
+    #hotelInfo['service'] = val["results"]["services"]
+    hotelInfo['service'] = serviceTuple
+
+
+    sql = "SELECT SType From Service Where hotelId = %s"
+    results = SelectQuery(sql,(hotelid),one=False)
+    serviceReviewList = []
+    for x in range(len(results)):
+        sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, ServiceReview sr WHERE re.ReviewId = sr.ReviewId and sr.HotelId = %s and sr.SType = %s"
+        re = SelectQuery(sql,(hotelid,results[x]["SType"]),one=False)
+        serviceReviewList.append((results[x]["SType"],re))
+
+    hotelInfo["serviceReviews"] = serviceReviewList
+
+
     minVal = int(val["results"]["min"])
     maxVal = int(val["results"]["max"])
     sql = "SELECT * FROM Hotel h WHERE h.HotelId=(%s)"
@@ -263,11 +306,74 @@ def hotel_page():
     hotelInfo["max"] = maxVal
     hotelInfo["entry"] = entry
     hotelInfo["depart"] = depart
+    hotelInfo["id"] = hotelid
     return render_template('hotel-page.html', hotelInfo=hotelInfo)
 
-@app.route('/reserve', methods=['POST'])
-def reserve():
-    pass
+@app.route('/add_checkout', methods=['POST'])
+def add_to_checkout():
+    #check to see if person is logged in:
+    #user_id = request.cookies.get('Session')
+    user_id = 2
+    checkout = request.cookies.get('Checkout')
+    response = redirect(url_for("search_page"))
+    #THIS IS FOR TESTING!! WHEN REGISTRATION IS DONE THIS WILL CHANGE
+    if user_id:
+        checkoutList = request.form.getlist('add_check')
+        listOfRooms = []
+        for x in checkoutList:
+            listOfRooms.append(json.loads(x))
+        if checkout:
+            checkout = json.loads(checkout)
+            for y in listOfRooms:
+                if y in checkout:
+                    continue
+                checkout.append(y)
+
+            response.set_cookie('Checkout', json.dumps(checkout))
+        else:
+            listOfRooms = json.dumps(listOfRooms)
+            response.set_cookie('Checkout', listOfRooms)
+        return response
+    else:
+        #return registration htmls
+        pass
+
+@app.route('/checkout', methods=["GET","POST"])
+def checkout():
+    #user_id = request.cookies.get('Session')
+    user_id = 2
+    checkout = json.loads(request.cookies.get('Checkout'))
+    if request.method == 'GET':
+        if user_id:
+            listInCheckout = []
+            for x in checkout:
+                hotelid = x["id"]
+                roomNo = x["roomNo"]
+                entry = x["entry"]
+                depart = x["depart"]
+                discount = x["discount"]
+                sql = "SELECT * FROM Room r, Hotel h WHERE r.HotelId = %s and r.RoomNo = %s"
+                results = SelectQuery(sql,(hotelid,roomNo),one=False)
+                results["discount"] = results['Price'] * (discount/100)
+                results["entry"] = entry
+                results["depart"] = depart
+            sql = "SELECT BType, Bprice FROM Breakfast WHERE Breakfast.HotelId = %s"
+            re = SelectQuery(sql,(hotelid),one=False)
+            results["breakfasts"] = re
+            sql = "SELECT SType, SCost FROM Service WHERE Service.HotelId = %s"
+            re = SelectQuery(sql,(hotelid),one=False)
+            results["services"] = re
+
+
+            return render_template("checkout.html",CL=results,initial="True")
+        else:
+            #reroute to register
+            pass
+    elif request.method == 'POST':
+        sql = "SELECT CNumber, ExpDate FROM CreditCards WHERE CreditCards.Cid = %s"
+        creditCards = SelectQuery(sql,(user_id),one=False)
+
+
 
 @app.route('/registerhotel', methods=['POST'])
 def register_hotel():
