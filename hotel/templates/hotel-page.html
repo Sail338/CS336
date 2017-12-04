@@ -11,11 +11,11 @@
         <h5>Room Minimum: ${{hotelInfo["min"]}} - Room Maximum: ${{hotelInfo["max"]}} </h5>
         <h5>Breakfast Options</h5>
         {% for b in hotelInfo["breakfast"] %}
-            <li> {{b[0]}} at ${{b[1]}} </li>
+            <li> {{b["BType"]}} at ${{b["BPrice"]}} </li>
         {% endfor %}
         <h5>Service Options</h5>
         {% for s in hotelInfo["service"] %}
-            <li> {{s[0]}} at ${{s[1]}} </li>
+            <li> {{s["SType"]}} at ${{s["SCost"]}} </li>
         {% endfor %}
         <h5>REMINDER: The Amount of Breakfast Options Per Room will be specified during checkout!<h5>
         <br><br><br>

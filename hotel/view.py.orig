@@ -90,6 +90,7 @@ def dashboard():
     reservations = SelectQueryKV("Reservation", fields={'Cid': cid})
     hotels = []
     for r in reservations:
+<<<<<<< HEAD
         hotelId = r['HotelId']
         invoiceNo = r['InvoiceNo']
         resDate = r['ResDate']
@@ -143,6 +144,10 @@ def edit_profile():
         return "OK"
     except:
         return "ERROR"
+=======
+        reserve = SelectQueryKV("Reserves", fields={"HotelId": r['HotelId'], "InvoiceNo": r['InvoiceNo']}, fetch_one=False)
+    return json.dumps(services)
+>>>>>>> fb50f9e86f887776245a15db16f16cfff97d6c28
 
 @app.route("/search-page", methods=['GET'])
 def search_page():

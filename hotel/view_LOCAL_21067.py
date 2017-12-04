@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from hotel import app
-from hotel.util import isNum, buildCheckoutData, InsertQuery, InsertQueryKV, SelectQuery, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
+from hotel.util import InsertQuery, InsertQueryKV, SelectQuery, SelectQueryKV, ExecuteRaw
+from hotel.util import buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
 import hashlib
 import json
 @app.route('/')
@@ -316,11 +317,11 @@ def hotel_page():
     hotelid = val["id"]
     sql = "SELECT BPrice as b FROM Breakfast WHERE Breakfast.HotelId = %s"
     results = SelectQuery(sql,(hotelid),one=False)
-    breakfastList = []
+    breakfastTuple = []
     for x in range(len(val["results"]["breakfasts"])):
-        breakfastList.append({"BType":val["results"]["breakfasts"][x],"BPrice":results[x]["b"]})
+        breakfastTuple.append((val["results"]["breakfasts"][x],results[x]["b"]))
     #hotelInfo['breakfast'] = val["results"]["breakfasts"]
-    hotelInfo['breakfast'] = breakfastList
+    hotelInfo['breakfast'] = breakfastTuple
 
 
     sql = "SELECT BType From Breakfast Where hotelId = %s"
@@ -334,11 +335,11 @@ def hotel_page():
     hotelInfo["breakfastReviews"] = breakfastReviewList
     sql = "SELECT SCost as s FROM Service WHERE Service.HotelId = %s"
     results = SelectQuery(sql,(hotelid), one=False)
-    serviceList = []
+    serviceTuple = []
     for x in range(len(val["results"]["services"])):
-        serviceList.append({"SType":val["results"]["services"][x],"SCost":results[x]["s"]})
+        serviceTuple.append((val["results"]["services"][x],results[x]["s"]))
     #hotelInfo['service'] = val["results"]["services"]
-    hotelInfo['service'] = serviceList
+    hotelInfo['service'] = serviceTuple
 
 
     sql = "SELECT SType From Service Where hotelId = %s"
@@ -377,7 +378,6 @@ def add_to_checkout():
         checkoutList = request.form.getlist('add_check')
         listOfRooms = []
         for x in checkoutList:
-            print(x)
             listOfRooms.append(json.loads(x))
         if checkout:
             checkout = json.loads(checkout)
@@ -402,105 +402,33 @@ def checkout():
     checkout = json.loads(request.cookies.get('Checkout'))
     if request.method == 'GET':
         if user_id:
-            listInCheckout = buildCheckoutData(checkout)
+            listInCheckout = []
+            for x in checkout:
+                hotelid = x["id"]
+                roomNo = x["roomNo"]
+                entry = x["entry"]
+                depart = x["depart"]
+                discount = x["discount"]
+                sql = "SELECT * FROM Room r, Hotel h WHERE r.HotelId = %s and r.RoomNo = %s"
+                results = SelectQuery(sql,(hotelid,roomNo),one=False)
+                results["discount"] = results['Price'] * (discount/100)
+                results["entry"] = entry
+                results["depart"] = depart
+            sql = "SELECT BType, Bprice FROM Breakfast WHERE Breakfast.HotelId = %s"
+            re = SelectQuery(sql,(hotelid),one=False)
+            results["breakfasts"] = re
+            sql = "SELECT SType, SCost FROM Service WHERE Service.HotelId = %s"
+            re = SelectQuery(sql,(hotelid),one=False)
+            results["services"] = re
 
-            return render_template("checkout.html",CL=listInCheckout,initial="True")
+
+            return render_template("checkout.html",CL=results,initial="True")
         else:
             #reroute to register
             pass
     elif request.method == 'POST':
-        #user_id = request.cookies.get('Session')
-        user_id = 2
-        checkout = json.loads(request.cookies.get('Checkout'))
-        try:
-            remove = request.form["remove"]
-        except:
-            remove = None
-        if user_id:
-            if remove:
-                response = redirect(url_for("checkout"))
-                remove = json.loads(remove)
-                for x in checkout:
-                    if remove["id"] == x["id"] and remove["roomNo"] == x["roomNo"]:
-                        checkout.remove(x)
-                        break
-                response.set_cookie('Checkout',json.dumps(checkout))
-                return response
-            else:
-                listOfData = buildCheckoutData(checkout)
-                #First Check Capacity
-                try:
-                    cap = request.form["cap"]
-                    cap = int(cap)
-                except ValueError:
-                    return render_template("checkout.html",CL=listOfData,initial=True,capError1=True)
-                total = 0
-                trueCap = 0
-                for x in listOfData:
-                    total += x['Price'] - (x['Price'] * x['discount'])
-                    trueCap += x['Capacity']
-                if cap > trueCap:
-                    return render_template("checkout.html",CL=listOfData,initial=True,capError2=True)
-
-
-                allB = request.form.getlist("bnum")
-                if "" in allB:
-                    return render_template("checkout.html",CL=listOfData,initial=True,valError=True)
-                countB = 0
-                for x in allB:
-                    if not isNum(x):
-                        return render_template("checkout.html",CL=listOfData,initial=True,valError=True)
-
-                for x in listOfData:
-                    for y in x['breakfasts']:
-                        y['mult'] = []
-
-                for x in listOfData:
-                    for y in x['breakfasts']:
-                        total += (y['BPrice'] * int(allB[countB]))
-                        y['mult'].append(allB[countB])
-                        countB+=1
-
-
-
-
-                re = request.form.getlist("sChoose")
-                allS = []
-
-                for x in re:
-                    allS.append(json.loads(x))
-                listToAdd = []
-                x = 0
-                y = 0
-                for x in range(len(listOfData)):
-                    for y in range(len(listOfData[x]['services'])):
-                        for z in allS:
-                            if listOfData[x]['HotelId'] == z['HotelId'] and listOfData[x]['RoomNo'] == z['RoomNo']:
-                                if listOfData[x]['services'][y]['SType'] == z['SType'] and listOfData[x]['services'][y] not in listToAdd:
-                                    listToAdd.append(listOfData[x]['services'][y])
-                    listOfData[x]['services'] = listToAdd
-                    listToAdd = []
-
-
-
-                for x in listOfData:
-                    for y in x['services']:
-                        total += y['SCost']
-
-
-                sql = "SELECT * FROM CreditCards WHERE CreditCards.Cid = %s"
-                creditCards = SelectQuery(sql,(user_id),one=False)
-                cc=True
-                if len(creditCards) == 0:
-                    cc=False
-
-                #NEED TO ADD TO RESERVATION WHEN THEY MAKE PAYMENT, ADD ALL THE ROOM TO ROOM RESERVES!!!!!
-
-                return render_template("checkout.html",CL=listOfData,total=total,cc=cc,creditCards=creditCards,initial=False)
-
-
-
-
+        sql = "SELECT CNumber, ExpDate FROM CreditCards WHERE CreditCards.Cid = %s"
+        creditCards = SelectQuery(sql,(user_id),one=False)
 
 
 
