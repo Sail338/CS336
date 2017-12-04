@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from hotel import app
-from hotel.util import InsertQuery, InsertQueryKV, SelectQuery, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
+from hotel.util import InsertQuery, InsertQueryKV, SelectQuery, SelectQueryKV, ExecuteRaw
+from hotel.util import buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
 import hashlib
 import json
 @app.route('/')
@@ -50,24 +51,27 @@ SELECT * FROM Reserves WHERE InvoiceNo IN (Reservation.InvoiceNo);
 SELECT * FROM Service WHERE HotelId IN (Reservation.HotelId);
 SELECT * FROM Hotel WHERE HotelId IN (Reservation.HotelID);
 '''
+class HotelR:
+    def __init__(self, invoiceNo, hotelId, name, room, services, checkRes, checkIn, checkOut):
+        self.name = name
+        self.room = room
+        self.invoiceNo = invoiceNo
+        self.hotelId = hotelId
+        self.services = services
+        self.checkRes = checkRes
+        self.checkIn = checkIn
+        self.checkOut = checkOut
+
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
     email = request.args.get('email')
-    return render_template('dashboard.html', user=user)
-    '''
-    user_id = request.cookies.get('Session')
-    if user_id:
-        #The if statement below would check if the cookie containeed is in the database,
-        #if it is you can directory take the user to the dashboard instead of having them login again
-        if True:
-            #user = {}
-            #user will a dictionary that contains all the information from the user
-            #that the html will use to display the corresponding data
-            user = {"Name": "Sam Azouzi","Age":20}
-            return render_template('dashboard.html', user=user)
-    else:
-        return redirect(url_for('home'))'''
-
+    customer = SelectQueryKV("Customer", columns='Name, Cid', fields={'Email': email}, fetch_one=True)
+    reservations = SelectQueryKV("Reservation", fields={'Cid': customer['Cid']})
+    hotels = []
+    for r in reservations:
+        reserve = SelectQueryKV("Reserves", fields={"HotelId": r['HotelId'], "InvoiceNo": r['InvoiceNo']}, fetch_one=False)
+    return json.dumps(services)
+    
 @app.route("/search-page", methods=['GET'])
 def search_page():
     return render_template('search.html')

@@ -16,10 +16,8 @@ def SelectQuery(query:str,x = None,one:bool = True)->dict:
     con = connect()
     with con.cursor() as cursor:
         cursor.execute(query,x)
-        if one == True:
-            return cursor.fetchone()
-        else:
-            return cursor.fetchall()
+        return cursor.fetchone() if one else cursor.fetchall()
+
 def InsertQuery(query:str, x):
     """
         Makes an INSERT Query
@@ -30,25 +28,40 @@ def InsertQuery(query:str, x):
     con.commit()
 
 def InsertQueryKV(table, fields):
-    keys = []
-    values = []
-    for k,v in fields.items():
-        keys.append(k)
-        values.append(v)
+    keys, values = [k for k in fields], [v for k,v in fields.items()]
     insert = "INSERT INTO (%s) VALUES (%s)" % (table, ','.join(keys), ','.join(values))
     conn = connect()
     with conn.cursor() as cursor:
         cursor.execute(insert)
     conn.commit()
 
+def ExecuteRaw(query, fetch_one=False):
+    conn = connect()
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+        return cursor.fetchone() if fetch_one else cursor.fetchall()
+
+def SelectQueryKV(table, columns="*", fields={}, fetch_one=False):
+    query = "SELECT %s FROM %s" % (columns, table)
+    print(query)
+    if len(fields) > 0:
+        where_query = ' AND '.join(['{} = {}'.format(k, v if isinstance(v, int) or isinstance(v, float)
+                                                          else '"%s"' % v) for k,v in fields.items()])
+        query = '%s WHERE %s' % (query, where_query)
+    print("Q: ", query)
+    conn = connect()
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+    return cursor.fetchone() if fetch_one else cursor.fetchall()
+        
 def geneRandCustomers():
     for i in range(100):
-         cid = i 
-         ph = str(rand.randint(1000000000000,9999999999999))
-         name =  str(names.get_full_name())
-         addr = str(rand.randint(10,99)) +  "   "  + names.get_first_name() + "way"
-         email = name.replace(" ",".") + "@gmail.com"
-         InsertQuery("INSERT INTO Customer VALUES (%s,%s,%s,%s,%s,%s)",(cid,None,email,addr,ph,name))
+        cid = i 
+        ph = str(rand.randint(1000000000000,9999999999999))
+        name =  str(names.get_full_name())
+        addr = str(rand.randint(10,99)) +  "   "  + names.get_first_name() + "way"
+        email = name.replace(" ",".") + "@gmail.com"
+        InsertQuery("INSERT INTO Customer VALUES (%s,%s,%s,%s,%s,%s)",(cid,None,email,addr,ph,name))
 
 def genHotels():
     for i in range(100):
