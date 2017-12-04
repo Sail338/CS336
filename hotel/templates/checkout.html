@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+    {% if {{initial}} %}
+      <h3>Just a few more questions before making your Reservation!</h4>
+      <h5>Please tell us your current capacity</h5>
+      <h5>Please choose, for each room which breafast you would like</h5>
+      <form action="/checkout" method = "Post">
+        Capacity: <input type="text" name="cap"><br><br><br>
+        {% for item in {{CL}} %}
+          <br><br>
+            <h5>{{item['Street']}} {{item['State']}} {{item['City']}} {{item['Zip']}}</h5>
+            <p>Room Number: {{item['RoomNo']}}  Floor: {{item["FloorNo"]}}  Standard Price: {{item['Price']}} Room Type {{item['Type']}}</p>
+            {% if item['discount'] != 0 %}
+              <p>Discount! New Price is: {{item['Price'] - item['discount']}}</p>
+            {% endif %}
+            {% for bf in {{item['breakfasts']}}%}
+              <input type="checkbox" name="breakfast" value='{{bf['BType']}}'>{{bf['BType']}} at ${{bf['BPrice']}}<br>
+            {% endfor %}
+            {% for sf in {{item['services']}}%}
+              <input type="checkbox" name="service" value='{{sf['SType']}}'>{{sf['SType']}} at ${{sf['SCost']}}<br>
+            {% endfor %}
+            <button type="submit" value='{ "id":{{item['HotelId']}},"roomNo":{{item['RoomNo']}} }'>Remove</button>
+          <br><br>
+        {% endfor %}
+
+      </form>
+    {% end %}
+  </body>
+</html>
