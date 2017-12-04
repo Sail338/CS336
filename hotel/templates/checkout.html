@@ -5,30 +5,85 @@
     <title>title</title>
   </head>
   <body>
-    {% if {{initial}} %}
+    {% if capError1 %}
+      <h3>Capacity entered is not a number!</h3>
+    {% endif %}
+    {% if capError2 %}
+      <h3>Capacity entered is too large for current reservation!</h3>
+    {% endif %}
+    {% if valError %}
+      <h3>One or more of your breakfast/service amounts are invalid numbers!</h3>
+    {% endif %}
+    {% if initial %}
       <h3>Just a few more questions before making your Reservation!</h4>
       <h5>Please tell us your current capacity</h5>
       <h5>Please choose, for each room which breafast you would like</h5>
-      <form action="/checkout" method = "Post">
+      <form action="/checkout" method = "POST">
         Capacity: <input type="text" name="cap"><br><br><br>
-        {% for item in {{CL}} %}
+        {% for item in CL %}
           <br><br>
             <h5>{{item['Street']}} {{item['State']}} {{item['City']}} {{item['Zip']}}</h5>
-            <p>Room Number: {{item['RoomNo']}}  Floor: {{item["FloorNo"]}}  Standard Price: {{item['Price']}} Room Type {{item['Type']}}</p>
+            <p>Room Number: {{item['RoomNo']}} | Floor: {{item["FloorNo"]}} | Standard Price: {{item['Price']}} | Room Type: {{item['Type']}}  | Capacity: {{item['Capacity']}}</p>
             {% if item['discount'] != 0 %}
               <p>Discount! New Price is: {{item['Price'] - item['discount']}}</p>
             {% endif %}
-            {% for bf in {{item['breakfasts']}}%}
-              <input type="checkbox" name="breakfast" value='{{bf['BType']}}'>{{bf['BType']}} at ${{bf['BPrice']}}<br>
+            {% if item['breakfasts']|length != 0 %}
+            <p>Breakfast Options</p>
+            {% endif %}
+            {% for bf in item['breakfasts'] %}
+              <input value=1 type="text" name="bnum">  * {{bf['BType']}} at ${{bf['BPrice']}}<br>
             {% endfor %}
-            {% for sf in {{item['services']}}%}
-              <input type="checkbox" name="service" value='{{sf['SType']}}'>{{sf['SType']}} at ${{sf['SCost']}}<br>
+            {% if item['services']|length != 0 %}
+            <br><p>Service Options</p>
+            {% endif %}
+            {% for sf in item['services'] %}
+              <input value='{"SType":"{{sf['SType']}}","HotelId":{{item['HotelId']}},"RoomNo":{{item['RoomNo']}}}' type="checkbox" name="sChoose">{{sf['SType']}} at ${{sf['SCost']}}<br>
             {% endfor %}
-            <button type="submit" value='{ "id":{{item['HotelId']}},"roomNo":{{item['RoomNo']}} }'>Remove</button>
+            <button type="submit" name = "remove" value='{"id":{{item['HotelId']}},"roomNo":{{item['RoomNo']}}}'>Remove</button>
           <br><br>
         {% endfor %}
-        <button type="submit" value='reserve'>Next</button>
+        <button type="submit" value='reserve'>Finish</button>
       </form>
-    {% end %}
+      {% else %}
+      <h3>Transaction</h4>
+      <h5>Total: ${{total}}</h5>
+      <h5>Following items Summed:</h5>
+      <form action="/checkout" method = "POST">
+        {% for item in CL %}
+          <br><br>
+            <h5>{{item['Street']}} {{item['State']}} {{item['City']}} {{item['Zip']}}</h5>
+            <p>Room Number: {{item['RoomNo']}} | Floor: {{item["FloorNo"]}} | Standard Price: {{item['Price']}} | Room Type: {{item['Type']}}  | Capacity: {{item['Capacity']}}</p>
+            {% if item['discount'] != 0 %}
+              <p>Discount! New Price is: {{item['Price'] - item['discount']}}</p>
+            {% endif %}
+            {% if item['breakfasts']|length != 0 %}
+            <p>Breakfast Options</p>
+            {% endif %}
+            {% for b in range(0,item['breakfasts']|length) %}
+              <p>{{item['breakfasts'][b]['BType']}} | {{item['breakfasts'][b]['mult'][0]}} * ${{item['breakfasts'][b]['BPrice']}}</p><br>
+            {% endfor %}
+            {% if item['services']|length != 0 %}
+            <br><p>Service Options</p>
+            {% endif %}
+            {% for s in range(item['services']|length) %}
+              <p>{{item['services'][s]['SType']}} | ${{item['services'][s]['SCost']}}</p><br>
+            {% endfor %}
+          <br><br>
+        {% endfor %}
+        <h4>Payment Method</h4>
+        {% if cc %}
+          {% for card in creditCards %}
+            <input type="radio" name="card" value='{{CNumber}}'>{{card['CNumber']}}   {{card['ExpDate']}}<br><br>
+          {% endfor %}
+        {% endif %}
+        <input type="radio" name="card" value="new">Add a card</p>
+          Card Number: <input type="text" name="cn"><br>
+          Billing Address: <input type="text" name="ba"><br>
+          Security Code: <input type="password" name="sc"><br>
+          Debit/Credit (D/B): <input type="text" name="dc"><br>
+          ExpDate: <input type="date" name="ed"><br><br>
+        <button type="submit" value='reserve'>Payment</button><br><br>
+      </form>
+    {% endif %}
   </body>
 </html>

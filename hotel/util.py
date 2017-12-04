@@ -11,7 +11,7 @@ def connect():
     return connection
 def SelectQuery(query:str,x = None,one:bool = True)->dict:
     """
-        Returns a SELECT  query, default is fetchOne , but specify one = False to fetchAll 
+        Returns a SELECT  query, default is fetchOne , but specify one = False to fetchAll
     """
     con = connect()
     with con.cursor() as cursor:
@@ -43,7 +43,7 @@ def InsertQueryKV(table, fields):
 
 def geneRandCustomers():
     for i in range(100):
-         cid = i 
+         cid = i
          ph = str(rand.randint(1000000000000,9999999999999))
          name =  str(names.get_full_name())
          addr = str(rand.randint(10,99)) +  "   "  + names.get_first_name() + "way"
@@ -97,14 +97,14 @@ def creditcards():
             month = rand.randint(1,12)
             day = rand.randint(1,31)
             yr = rand.randint(10,39)
-             
+
             ccnumber =  str(rand.randint(00000000,99999999))
             print(ccnumber)
             ctype_ = ctype[rand.randint(0,1)]
             InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(i,ccnumber,addr,name,seccode,ctype_,str(month) + "/" + str(day) + "/" + str(yr)))
 
 def buildQueryBreakfasts(blist):
-    base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s" 
+    base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s"
 
     for i in blist:
         base += " AND EXISTS (SELECT h1.hotelID FROM Room r , Breakfast s WHERE r.HotelId = h1.HotelId and h1.Hotelid = s.Hotelid AND '" + str(i)+ "' " +  " = s.Btype)"
@@ -113,7 +113,7 @@ def buildQueryBreakfasts(blist):
 
 
 def buildQuerySerices(slist):
-    base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s" 
+    base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s"
 
     for i in slist:
         base += " AND EXISTS (SELECT h1.hotelID FROM Room r , Service s WHERE r.HotelId = h1.HotelId and h1.Hotelid = s.Hotelid AND '" + str(i)+ "' " +  " = s.Stype)"
@@ -123,9 +123,9 @@ def buildQuerySerices(slist):
 
 def buildQueryServiceBreakfasts(slist,blist):
 
-    base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s" 
+    base = "SELECT * FROM Room r INNER JOIN Hotel h1 on h1.HotelId = r.HotelId INNER JOIN Service s on h1.Hotelid = s.Hotelid INNER JOIN  Breakfast b on h1.hotelid = b.hotelid  WHERE h1.Country IN (%s) and h1.state IN (%s) AND r.price >%s and r.price <%s"
 
-    
+
     for i in blist:
         base += " AND EXISTS (SELECT h1.hotelID FROM Room r , Breakfast s WHERE r.HotelId = h1.HotelId and h1.Hotelid = s.Hotelid AND '" + str(i)+ "' " +  " = s.Btype)"
 
@@ -135,3 +135,35 @@ def buildQueryServiceBreakfasts(slist,blist):
 
     base += "GROUP BY h1.hotelid"
     return base
+
+def buildCheckoutData(checkout):
+    listInCheckout = []
+    for x in checkout:
+        hotelid = x["id"]
+        roomNo = x["roomNo"]
+        entry = x["entry"]
+        depart = x["depart"]
+        print(depart)
+        discount = x["discount"]
+        sql = "SELECT * FROM Room , Hotel WHERE Room.HotelId = %s and Room.RoomNo = %s"
+        results = SelectQuery(sql,(hotelid,roomNo),one=True)
+        results["discount"] = results['Price'] * (discount/100)
+        results["entry"] = entry
+        results["depart"] = depart
+        listOfB = []
+        sql = "SELECT BType, BPrice FROM Breakfast WHERE Breakfast.HotelId = %s"
+        re = SelectQuery(sql,(hotelid),one=False)
+        results["breakfasts"] = re
+        listOfS = []
+        sql = "SELECT SType, SCost FROM Service WHERE Service.HotelId = %s"
+        re = SelectQuery(sql,(hotelid),one=False)
+        results["services"] = re
+        listInCheckout.append(results)
+    return listInCheckout
+
+def isNum(x):
+    try:
+        val = int(x)
+        return True
+    except ValueError:
+        return False
