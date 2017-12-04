@@ -1,0 +1,25 @@
+{% extends "dashboard-base.html" %}
+{% block content %}
+    <div id='profile'>
+        <form action='/profileedit'>
+            <div class='section-header'><p> Personal Information </p></div>
+            <div id='personal-fields'>
+                {% for data in personal %}
+                    <div class='personal-field-label'><p> {{ data[0] }} </p></div><div class='personal-field-value'><input type='text' name='{{ data[0] }}' value='{{ data[1] }}'></div>
+                {% endfor %}
+            </div>
+            <div class='section-header'><p> Credit Cards </p></div>
+                <div id='creditcards'>
+                    {% for cc in ccs %}
+                        <div class='creditcard'>
+                            {% for ccf in cc %}
+                                <div class='ccfield'><p> {{ ccf[0] }} </p></div><div class='cc-field-value'><input type='text' name='cc[]{{ ccf[1] }}' value='{{ ccf[2] }}'></div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <input type='submit' text='Submit'>
+        </form>
+    </div>
+{% endblock %}

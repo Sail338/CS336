@@ -53,26 +53,98 @@ SELECT * FROM Service WHERE HotelId IN (Reservation.HotelId);
 SELECT * FROM Hotel WHERE HotelId IN (Reservation.HotelID);
 '''
 class HotelR:
-    def __init__(self, invoiceNo, hotelId, name, room, services, checkRes, checkIn, checkOut):
+    def __init__(self, invoiceNo, hotelId, name, checkRes, rooms, services, total):
         self.name = name
-        self.room = room
         self.invoiceNo = invoiceNo
         self.hotelId = hotelId
+        self.resDate = str(checkRes)
         self.services = services
-        self.checkRes = checkRes
-        self.checkIn = checkIn
-        self.checkOut = checkOut
+        self.rooms = rooms
+        self.total = total
+
+    def toDict(self):
+        dictD = self.__dict__
+        dictD['rooms'] = [r.toDict() for r in self.rooms]
+        dictD['services'] = [s.toDict() for s in self.services]
+        return dictD
+
+class ServiceR:
+    def __init__(self, stype, price):
+        self.stype = stype
+        self.price = price
+    def toDict(self):
+        return self.__dict__
+
+class RoomR:
+    def __init__(self, roomNo, price, checkIn, checkOut):
+        self.roomNo = roomNo
+        self.price = price
+        self.checkIn = str(checkIn)
+        self.checkOut = str(checkOut)
+    def toDict(self):
+        return self.__dict__
 
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
-    email = request.args.get('email')
-    customer = SelectQueryKV("Customer", columns='Name, Cid', fields={'Email': email}, fetch_one=True)
-    reservations = SelectQueryKV("Reservation", fields={'Cid': customer['Cid']})
+    cid = request.args.get('cid')
+    customer = SelectQueryKV("Customer", columns='Name', fields={'Cid': cid}, fetch_one=True)
+    reservations = SelectQueryKV("Reservation", fields={'Cid': cid})
     hotels = []
     for r in reservations:
-        reserve = SelectQueryKV("Reserves", fields={"HotelId": r['HotelId'], "InvoiceNo": r['InvoiceNo']}, fetch_one=False)
-    return json.dumps(services)
-    
+        hotelId = r['HotelId']
+        invoiceNo = r['InvoiceNo']
+        resDate = r['ResDate']
+        totalAmt = r['TotalAmt']
+        hotel = SelectQueryKV("Hotel", fields={"HotelId": hotelId}, fetch_one=True)
+        # fetches all rooms reserved in the reservation
+        reserves = SelectQueryKV("Reserves", fields={"HotelId": hotelId, "InvoiceNo": invoiceNo}) 
+        services = SelectQueryKV("Service", fields={"HotelId": hotelId})
+        rooms = [RoomR(res['RoomNo'],
+                 SelectQueryKV("Room", columns="Price", fields={"RoomNo": res['RoomNo'], "HotelId": hotelId}, fetch_one=True)['Price'],
+                 res['InDate'], res['OutDate']) for res in reserves]
+        services = [ServiceR(s['SType'], s['SCost']) for s in services]
+        name = '%s - %s, %s %s, %s %s' % (hotelId, hotel['Street'], hotel['City'], hotel['State'], hotel['Country'], hotel['Zip'])
+        hotels.append(HotelR(invoiceNo, hotelId, name, resDate, rooms, services, totalAmt))
+    return render_template('dashboard.html', hotels=hotels)
+
+'''
+------------------------------------------------------------------------------------------
+------------------------------------ SQL QUERIES USED ------------------------------------
+------------------------------------------------------------------------------------------
+(In order)
+
+SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = c.Cid; (Personal)
+Select * from CreditCards WHERE Cid = cid; (Credit Cards)
+'''
+@app.route("/profile", methods=['GET'])
+def profile():
+    cid = request.args.get('cid')
+    personalQuery = "SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = c.Cid"
+    personal = ExecuteRaw(personalQuery, fetch_one=True)
+    personalKV = [(k, personal[k]) for k in ['Name', 'Email', 'Address', 'PhoneNo']]
+    creditCards = SelectQueryKV("CreditCards", fields={"Cid": cid})
+    creditCardsKV = [[((k,k, cc[k]) if isinstance(k, str) else (k[0], k[1], cc[k[1]])) for k in [('Credit Card Number', 'CNumber'), 'Name',
+                                                                          ('Billing Address', 'BillingAddr'), ('CVV', 'SecCode'),
+                                                                          'Type', ('Expires', 'ExpDate')]] for cc in creditCards]
+    print(creditCardsKV)
+    return render_template("profile.html", personal=personalKV, ccs=creditCardsKV)
+
+@app.route('/profileedit', methods=['POST'])
+def edit_profile():
+    m = hashlib.sha1()
+    try:
+        password = m.update(request.form['password'].encode('utf-8').hexdigest())
+        update_cards = request.form['cards'] # perform set operation to figure out which cards to add, update, and delete
+        existing_cards = [] # getCreditCardsForUser(
+        update_card_nos = set([card['card_no'] for card in existing_cards])
+        existing_card_nos = set([card['card_no'] for card in update_card_nos])
+        add_cards = update_card_nos - existing_card_nos # add these cards to db
+        update_cards = update_card_nos & existing_card_nos # update these cards in db
+        remove_cards = existing_card_nos - update_card_nos # remove these cards in db
+        return "OK"
+    except:
+        return "ERROR"
+
 @app.route("/search-page", methods=['GET'])
 def search_page():
     return render_template('search.html')
@@ -204,21 +276,6 @@ def register_page():
 def get_profile():
     user = request.cookies.get('username')
 
-@app.route('/profileedit', methods=['POST'])
-def edit_profile():
-    m = hashlib.sha1()
-    try:
-        password = m.update(request.form['password'].encode('utf-8').hexdigest())
-        update_cards = request.form['cards'] # perform set operation to figure out which cards to add, update, and delete
-        existing_cards = [] # getCreditCardsForUser(
-        update_card_nos = set([card['card_no'] for card in existing_cards])
-        existing_card_nos = set([card['card_no'] for card in update_card_nos])
-        add_cards = update_card_nos - existing_card_nos # add these cards to db
-        update_cards = update_card_nos & existing_card_nos # update these cards in db
-        remove_cards = existing_card_nos - update_card_nos # remove these cards in db
-        return "OK"
-    except:
-        return "ERROR"
 
 @app.route('/browse', methods=['GET'])
 def browse():
