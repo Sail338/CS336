@@ -250,7 +250,7 @@ def hotel_page():
     hotelInfo = {}
     for x in range(len(results)):
         sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, RoomReview ro WHERE ro.ReviewId = re.ReviewId and ro.RoomNo = %s and re.HotelId = %s"
-        re = SelectQuery(sql,(results["RoomNo"],val["id"]),one=False)
+        re = SelectQuery(sql,(results[x]["RoomNo"],val["id"]),one=False)
         results[x]["Reviews"] = re;
     hotelInfo["rooms"] = results
     hotelid = val["id"]
@@ -269,7 +269,7 @@ def hotel_page():
     for x in range(len(results)):
         sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, BreakfastReview br WHERE re.ReviewId = br.ReviewId and br.HotelId = %s and br.BType = %s"
         re = SelectQuery(sql,(hotelid,results[x]["BType"]),one=False)
-        breakfastReviewList[x] = (results[x]["BType"],re)
+        breakfastReviewList.append((results[x]["BType"],re))
 
     hotelInfo["breakfastReviews"] = breakfastReviewList
     sql = "SELECT SCost as s FROM Service WHERE Service.HotelId = %s"
@@ -287,7 +287,7 @@ def hotel_page():
     for x in range(len(results)):
         sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, ServiceReview sr WHERE re.ReviewId = sr.ReviewId and sr.HotelId = %s and sr.SType = %s"
         re = SelectQuery(sql,(hotelid,results[x]["SType"]),one=False)
-        serviceReviewList[x] = (results[x]["SType"],re)
+        serviceReviewList.append((results[x]["SType"],re))
 
     hotelInfo["serviceReviews"] = serviceReviewList
 
