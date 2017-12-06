@@ -60,7 +60,9 @@
             <p>Breakfast Options</p>
             {% endif %}
             {% for b in range(0,item['breakfasts']|length) %}
-              <p>{{item['breakfasts'][b]['BType']}} | {{item['breakfasts'][b]['mult'][0]}} * ${{item['breakfasts'][b]['BPrice']}}</p><br>
+              {% if item['breakfasts'][b]['mult'][0] != '0' %}
+                <p>{{item['breakfasts'][b]['BType']}} | {{item['breakfasts'][b]['mult'][0]}} * ${{item['breakfasts'][b]['BPrice']}}</p><br>
+              {% endif %}
             {% endfor %}
             {% if item['services']|length != 0 %}
             <br><p>Service Options</p>
@@ -82,7 +84,7 @@
           Security Code: <input type="password" name="sc"><br>
           Debit/Credit (D/B): <input type="text" name="dc"><br>
           ExpDate: <input type="date" name="ed"><br><br>
-        <button type="submit" value='reserve'>Payment</button><br><br>
+        <button type="submit" name='payment' value='{{total}}'>Payment</button><br><br>
       </form>
     {% endif %}
   </body>

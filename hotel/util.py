@@ -1,5 +1,5 @@
 import pymysql
-import config
+import hotel.config as config
 import names
 import random as rand
 def connect():

@@ -96,7 +96,7 @@ def dashboard():
         totalAmt = r['TotalAmt']
         hotel = SelectQueryKV("Hotel", fields={"HotelId": hotelId}, fetch_one=True)
         # fetches all rooms reserved in the reservation
-        reserves = SelectQueryKV("Reserves", fields={"HotelId": hotelId, "InvoiceNo": invoiceNo}) 
+        reserves = SelectQueryKV("Reserves", fields={"HotelId": hotelId, "InvoiceNo": invoiceNo})
         services = SelectQueryKV("Service", fields={"HotelId": hotelId})
         rooms = [RoomR(res['RoomNo'],
                  SelectQueryKV("Room", columns="Price", fields={"RoomNo": res['RoomNo'], "HotelId": hotelId}, fetch_one=True)['Price'],
@@ -497,6 +497,36 @@ def checkout():
                 #NEED TO ADD TO RESERVATION WHEN THEY MAKE PAYMENT, ADD ALL THE ROOM TO ROOM RESERVES!!!!!
 
                 return render_template("checkout.html",CL=listOfData,total=total,cc=cc,creditCards=creditCards,initial=False)
+
+
+@app.route('/payment', methods=['POST'])
+def payment():
+    whatCard = request.form['card']
+    if whatCard == "new":
+        cNum = request.form['cn']
+        bAddr = request.form['ba']
+        sCode = request.form['sc']
+        tCard = request.form['dc']
+        expDate = request.form['ed']
+        #user_id = request.cookies.get('Session')
+        user_id = 2
+        name = SelectQuery("SELECT Name FROM Customer WHERE Customer.Cid = %s",(user_id))
+        name = name['Name']
+        try:
+            InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(user_id,cNum,bAddr,name,sCode,tCard,expDate))
+        except:
+            return render_template("search.html")
+
+    #Now we gotta put this thank in RESERVATION
+    current = request.cookies.get("Checkout")
+    checkout = []
+    while x in current:
+        checkout.append(json.loads(x))
+        total = request.form['payment']
+        invoiceNo = SelectQuery("Select MAX(InvoiceNo) as iNo FROM Reservation")
+        invoiceNo = invoiceNo['iNo']
+        #Fill In later
+        InsertQuery("INSERT INTO RESERVATION VALUES (%s,%s,%s,%s,%s)",(invoiceNo,user_id,None,None,total))
 
 
 
