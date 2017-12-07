@@ -45,38 +45,43 @@
             <h2 class="subtitle titleColored">
                 Phone Number: {{hotelInfo["phone"]}}
             </h2>
-            <p>
-                {{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}
+            <div>
+                <p><b><u> Your Stay Details </u></b></p>
+                <p>
+                    {{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}
+                </p>
+                <p>
+                    
+                    Room Minimum: ${{hotelInfo["min"]}} &#8729 Room Maximum: ${{hotelInfo["max"]}}
+                </p>
+
+                <p><b>Breakfast Options</b>
+                {% if hotelInfo["breakfast"]|count < 1 %}
+                    : None
+                {% endif %}
+                {% for b in hotelInfo["breakfast"] %}
+                <span class="tag is-info">
+
+                    {{b["BType"]}} at ${{b["BPrice"]}}
+                </span>
+                {% endfor %}
+                </p>
+
+                <p><b>Service Options</b>
+                {% if hotelInfo["service"]|count < 1 %}
+                    : None
+                {% endif %}
+                {% for s in hotelInfo["service"] %}
+                <span class="tag is-info">
+                    {{s["SType"]}} at ${{s["SCost"]}}
+                </span>
+                {% endfor %}
+                </p>
                 <br>
-                Room Minimum: ${{hotelInfo["min"]}} &#8729 Room Maximum: ${{hotelInfo["max"]}}
-            </p>
-
-            <p><b>Breakfast Options</b>
-            {% if hotelInfo["breakfast"]|count < 1 %}
-                : None
-            {% endif %}
-            {% for b in hotelInfo["breakfast"] %}
-            <span class="tag">
-
-                {{b["BType"]}} at ${{b["BPrice"]}}
-            </span>
-            {% endfor %}
-            </p>
-
-            <p><b>Service Options:</b>
-            {% if hotelInfo["service"]|count < 1 %}
-                : None
-            {% endif %}
-            {% for s in hotelInfo["service"] %}
-            <span class="tag">
-                {{s["SType"]}} at ${{s["SCost"]}}
-            </span>
-            {% endfor %}
-            </p>
-            <br>
-            <p class="is-size-7">
-            REMINDER: The Amount of Breakfast Options Per Room will be specified during checkout!
-            </p>
+                <p class="is-size-7">
+                REMINDER: The Amount of Breakfast Options Per Room will be specified during checkout!
+                </p>
+            </div>
         </div>
 
       </div>
@@ -86,12 +91,42 @@
 
 
     <div class="hero-body">
-      <div class="container has-text-centered">
+      <div class="container">
 
+        {% if hotelInfo["rooms"]|length == 0 %}
         <div class="box has-text-centered login">
-
+            <p>No Rooms with open space, please try again at a later date!</p>
         </div>
-
+        {% else %}
+            <form action="/add_checkout" method="POST">
+            {% for room in hotelInfo["rooms"] %}
+             <div class="box login">
+                <div class="columns">
+                    <div class="column">
+                        <h3 class="title is-3 titleColored">Room Number: {{room['RoomNo']}}</h3>
+                        {% if room['Discount'] != 0 %}
+                          <p>This Room has a discount of {{room["Discount"]}}%!</p>
+                        {% endif %}
+                        <h4 class="subtitle is-4 titleColored">Floor: {{room['FloorNo']}}</h4>
+                        {% if room['Discount'] != 0 %}
+                          <input type="checkbox" class="checkbox" name="add_check" value='{"id":{{hotelInfo['id']}},"roomNo":{{room['RoomNo']}},"entry":"{{hotelInfo['entry']}}","depart":"{{hotelInfo['depart']}}","discount":{{room['Discount']}}}'>Add To Checkout
+                        {% else %}
+                          <input type="checkbox" class="checkbox" name="add_check" value='{"id":{{hotelInfo['id']}},"roomNo":{{room['RoomNo']}},"entry":"{{hotelInfo['entry']}}","depart":"{{hotelInfo['depart']}}","discount":0}'>Add To Checkout
+                        {% endif %}
+                    </div>
+                    <div class="column">
+                    <p><b>Room Description:</b> {{room['Description']}}</p>
+                    <p><b>Room Price Per Night:</b> {{room['Price']}}</p>
+                    <p><b>Room Capacity:</b> {{room['Capacity']}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div style="text-align:center">
+            <button class="button" id="checkoutButton" type="submit">Checkout</button>
+            </div>
+            </form>
+        {% endif %}
         
       </div>
     </div>
@@ -99,7 +134,7 @@
     </section>
 
 
-        <h2>{{hotelInfo["address"]}}</h2>
+<!--         <h2>{{hotelInfo["address"]}}</h2>
         <h3>{{hotelInfo["phone"]}}</h3>
         <h5>{{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}</h5>
         <h5>Room Minimum: ${{hotelInfo["min"]}} - Room Maximum: ${{hotelInfo["max"]}} </h5>
@@ -139,7 +174,7 @@
             {% endfor %}
             <button type="submit">Checkout</button>
         </form>
-        {% endif %}
+        {% endif %} -->
 
 
   </body>
