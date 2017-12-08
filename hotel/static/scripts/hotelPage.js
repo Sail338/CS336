@@ -1,6 +1,6 @@
 $(".tag").click(function() {
-	console.log($(".tag").find("div")[0]);
-  $(".tag").find("div")[0].find("div").addClass("is-active");  
+	console.log($($(this).next()).find("div"));
+  $($(this).next()).find("div").addClass("is-active");  
 });
 
 $(".modal-close").click(function() {

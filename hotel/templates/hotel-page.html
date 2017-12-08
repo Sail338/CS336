@@ -45,7 +45,7 @@
             <h2 class="subtitle titleColored">
                 Phone Number: {{hotelInfo["phone"]}}
             </h2>
-            <div>
+            <div class="container is-grouped is-grouped-centered has-text-centered">
                 <p><b><u> Your Stay Details </u></b></p>
                 <p>
                     {{hotelInfo["entry"]}} to {{hotelInfo["depart"]}}
@@ -55,44 +55,77 @@
                     Room Minimum: ${{hotelInfo["min"]}} &#8729 Room Maximum: ${{hotelInfo["max"]}}
                 </p>
 
-                <p><b>Breakfast Options</b>
-                {% if hotelInfo["breakfast"]|count < 1 %}
-                    : None
-                {% endif %}
-                {% for b in hotelInfo["breakfast"] %}
-                <span class="tag is-info">
-                    {{b["BType"]}} at ${{b["BPrice"]}}
-                </span>
-                {% endfor %}
-                </p>
-
-                <p><b>Service Options</b>
-                {% if hotelInfo["service"]|count < 1 %}
-                    : None
-                {% endif %}
-                {% for s in hotelInfo["service"] %}
-                <span class="tag is-info">
-                    {{s["SType"]}} at ${{s["SCost"]}}
-                </span>
-                <!-- <div class="container">
-                  <div class="modal">
-                    <div class="modal-background"></div>
-                    <div class="modal-content">
-                      <div class="box">
-                        <article class="media">
-                          <div class="media-content">
-                            <div class="content">
-                             <p>{{s["SType"]}}</p>
+                <div class="container is-grouped is-grouped-centered">
+                    <p><b>Breakfast Options</b>
+                    {% if hotelInfo["breakfast"]|count < 1 %}
+                        : None
+                    {% endif %}
+                    {% for b in hotelInfo["breakfast"] %}
+                    <div class="container tagHolder">
+                        <span class="tag is-info">
+                            {{b["BType"]}} at {{b["BPrice"]}}
+                        </span>
+                    
+                    {% if hotelInfo["breakfastReviews"]|count > 1 %}
+                        <div class="container">
+                          <div class="modal">
+                            <div class="modal-background"></div>
+                            <div class="modal-content">
+                              <div class="box">
+                              {% for review in hotelInfo["breakfastReviews"] %}
+                                <article class="media">
+                                <span class="tag">
+                                    {{review["rate"]}}
+                                </span>
+                                     <p>{{review["tc"]}}</p>
+                                </article>
+                                {% endfor %}
+                              </div>
                             </div>
+                            <button class="modal-close is-large" aria-label="close"></button>
                           </div>
-                        </article>
-                      </div>
+                        </div>
+                        {% endif %}
                     </div>
-                    <button class="modal-close is-large" aria-label="close"></button>
-                  </div>
-                </div> -->
-                {% endfor %}
-                </p>
+                    </p>
+                    {% endfor %}
+                </div>
+
+                <div class="container is-grouped is-grouped-centered">
+                    <p><b>Service Options</b>
+                    {% if hotelInfo["service"]|count < 1 %}
+                        : None
+                    {% endif %}
+                    {% for s in hotelInfo["service"] %}
+                    <div class="container tagHolder">
+                        <span class="tag is-info">
+                            {{s["SType"]}} at ${{s["SCost"]}}
+                        </span>
+                        {% if hotelInfo["serviceReviews"]|count > 1 %}
+                        <div class="container">
+                          <div class="modal">
+                            <div class="modal-background"></div>
+                            <div class="modal-content">
+                              <div class="box">
+                              {% for review in hotelInfo["serviceReviews"] %}
+                                <article class="media">
+                                <span class="tag">
+                                    {{review["rate"]}}
+                                </span>
+                                     <p>{{review["tc"]}}</p>
+                                </article>
+                                {% endfor %}
+                              </div>
+                            </div>
+                            <button class="modal-close is-large" aria-label="close"></button>
+                          </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    </p>
+                    {% endfor %}
+                </div>
+
                 <br>
                 <p class="is-size-7">
                 REMINDER: The Amount of Breakfast Options Per Room will be specified during checkout!
@@ -144,7 +177,7 @@
                             <span class="tag">
                             {{review["rate"]}}
                             </span>
-                            <p> {{review["TextComment"]}} </p>
+                            <p> {{review["tc"]}} </p>
                         </article>
                     {% endfor %}
                     <!-- To Test -->
