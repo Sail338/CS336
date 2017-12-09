@@ -175,8 +175,10 @@ def search():
     if states == '' or countries == '':
         error.append("Please input a valid state or country")
     else:
+    
         dtparsed = datetime.datetime.strptime(entry,'%Y-%m-%d')
-        dtparsed2 = datetime.datetime.strptime(depart,'%Y-%d-%m')
+
+        dtparsed2 = datetime.datetime.strptime(depart,'%Y-%m-%d')
         if dtparsed2 < dtparsed:
             error.append("Please make checkout date AFTER the entry date")
         if dtparsed < datetime.datetime.now():
