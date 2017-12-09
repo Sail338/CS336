@@ -60,24 +60,34 @@
                     {% if hotelInfo["breakfast"]|count < 1 %}
                         : None
                     {% endif %}
-                    {% for b in hotelInfo["breakfast"] %}
-                    <div class="container tagHolder">
+
+                    {% for b in hotelInfo["breakfastReviews"] %}
+                    <div style="display: inline-block;" class="tagHolder">
                         <span class="tag is-info">
-                            {{b["BType"]}} at {{b["BPrice"]}}
+                            {{b[0]}} at ${{b[1]}}
                         </span>
                     
-                    {% if hotelInfo["breakfastReviews"]|count > 1 %}
-                        <div class="container">
+                        <div style="display: none;" class="container">
                           <div class="modal">
                             <div class="modal-background"></div>
                             <div class="modal-content">
                               <div class="box">
-                              {% for review in hotelInfo["breakfastReviews"] %}
+                              {% if b[2]|count < 1 %}
+                              <p> No Reviews </p>
+                              {% else %}
+                                <p><b>Reviews</b></p><br>
+                              {% endif %}
+
+                              {% for review in b[2] %}
                                 <article class="media">
-                                <span class="tag">
-                                    {{review["rate"]}}
-                                </span>
-                                     <p>{{review["tc"]}}</p>
+                                    <div class="media-left">
+                                        <span class="tag">
+                                        {{review["rate"]}}
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <p>{{review["tc"]}}</p>
+                                    </div>
                                 </article>
                                 {% endfor %}
                               </div>
@@ -85,34 +95,47 @@
                             <button class="modal-close is-large" aria-label="close"></button>
                           </div>
                         </div>
-                        {% endif %}
                     </div>
                     </p>
                     {% endfor %}
                 </div>
 
                 <div class="container is-grouped is-grouped-centered">
-                    <p><b>Service Options</b>
+                    <p><b>Service Options</b></p>
                     {% if hotelInfo["service"]|count < 1 %}
                         : None
                     {% endif %}
                     {% for s in hotelInfo["serviceReviews"] %}
-                    <div class="container tagHolder">
+                        
+                    <div style="display: inline-block;" class="tagHolder">
                         <span class="tag is-info">
                             {{s[0]}} at ${{s[1]}}
                         </span>
-                        {% if hotelInfo["serviceReviews"]|count > 1 %}
-                        <div class="container">
+                        
+                        <div style="display: none;" class="container">
                           <div class="modal">
-                            <div class="modal-background"></div>
+                            <div class="modal-background">
+                            </div>
                             <div class="modal-content">
                               <div class="box">
-                              {% for review in hotelInfo["serviceReviews"][2] %}
+                                {% if s[2]|count < 1 %}
+                                <p> No Reviews </p>
+                                {% else %}
+                                <p><b>Reviews</b></p><br>
+                                {% endif %}
+                              {% for review in s[2] %}
                                 <article class="media">
-                                <span class="tag">
+                                <div class="media-left">
+                                    <span class="tag">
                                     {{review["rate"]}}
-                                </span>
-                                     <p>{{review["tc"]}}</p>
+                                    </span>
+                                </div>
+                                <div class="media-content">
+                                    <p>{{review["tc"]}}</p>
+                                </div>
+                                    
+
+                                    
                                 </article>
                                 {% endfor %}
                               </div>
@@ -120,9 +143,9 @@
                             <button class="modal-close is-large" aria-label="close"></button>
                           </div>
                         </div>
-                        {% endif %}
+                        
                     </div>
-                    </p>
+                    
                     {% endfor %}
                 </div>
 
@@ -158,11 +181,14 @@
                               <p>This Room has a discount of {{room["Discount"]}}%!</p>
                             {% endif %}
                             <h4 class="subtitle is-4 titleColored">Floor: {{room['FloorNo']}}</h4>
+                            <button type="button" class="button reviewButton">Reviews</button>
+                            <br><br>
                             {% if room['Discount'] != 0 %}
                               <input type="checkbox" class="checkbox" name="add_check" value='{"id":{{hotelInfo['id']}},"roomNo":{{room['RoomNo']}},"entry":"{{hotelInfo['entry']}}","depart":"{{hotelInfo['depart']}}","discount":{{room['Discount']}}}'>Add To Checkout
                             {% else %}
                               <input type="checkbox" class="checkbox" name="add_check" value='{"id":{{hotelInfo['id']}},"roomNo":{{room['RoomNo']}},"entry":"{{hotelInfo['entry']}}","depart":"{{hotelInfo['depart']}}","discount":0}'>Add To Checkout
                             {% endif %}
+                            
                         </div>
                         <div class="column">
                         <p><b>Room Description:</b> {{room['Description']}}</p>
@@ -173,15 +199,25 @@
 
                 </article>
 
-                {% for review in room['Reviews'] %}
+                
+                <div style="display: none;" class="roomReviews has-text-centered">
+                <hr>
+                    <p><b><u>Reviews</u></b></p>
+                    {% if room['Reviews']|count < 1 %}
+                        <br>None
+                    {% endif %}
+
+                    {% for review in room['Reviews'] %}
                     <br>
-                        <article class="media">
-                            <span class="tag">
+
+                        <div>
+                            <span class="tag is-inline-block">
                             {{review["rate"]}}
                             </span>
-                            <p> {{review["tc"]}} </p>
-                        </article>
+                            <p class="is-inline-block"> {{review["tc"]}} </p>
+                        </div>
                 {% endfor %}
+                </div>
                 
             </div>
             {% endfor %}
