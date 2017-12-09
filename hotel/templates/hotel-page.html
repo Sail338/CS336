@@ -171,18 +171,18 @@
                         </div>
                     </div>
 
-                    <!-- To Test and Add on Click -->
-                    {% for review in room['Reviews'] %}
+                </article>
+
+                {% for review in room['Reviews'] %}
+                    <br>
                         <article class="media">
                             <span class="tag">
                             {{review["rate"]}}
                             </span>
                             <p> {{review["tc"]}} </p>
                         </article>
-                    {% endfor %}
-                    <!-- To Test -->
-
-                </article>
+                {% endfor %}
+                
             </div>
             {% endfor %}
             <div style="text-align:center">
