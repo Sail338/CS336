@@ -325,13 +325,13 @@ def hotel_page():
     hotelInfo['breakfast'] = breakfastList
 
 
-    sql = "SELECT BType From Breakfast Where hotelId = %s"
+    sql = "SELECT BType, BPrice From Breakfast Where hotelId = %s"
     results = SelectQuery(sql,(hotelid),one=False)
     breakfastReviewList = []
     for x in range(len(results)):
         sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, BreakfastReview br WHERE re.ReviewId = br.ReviewId and br.HotelId = %s and br.BType = %s"
         re = SelectQuery(sql,(hotelid,results[x]["BType"]),one=False)
-        breakfastReviewList.append((results[x]["BType"],re))
+        breakfastReviewList.append((results[x]["BType"],results[x]['BPrice'],re))
 
     hotelInfo["breakfastReviews"] = breakfastReviewList
     sql = "SELECT SCost as s FROM Service WHERE Service.HotelId = %s"
@@ -343,13 +343,13 @@ def hotel_page():
     hotelInfo['service'] = serviceList
 
 
-    sql = "SELECT SType From Service Where hotelId = %s"
+    sql = "SELECT SType, SCost From Service Where hotelId = %s"
     results = SelectQuery(sql,(hotelid),one=False)
     serviceReviewList = []
     for x in range(len(results)):
         sql = "SELECT re.Rating as rate, re.TextComment as tc FROM Review re, ServiceReview sr WHERE re.ReviewId = sr.ReviewId and sr.HotelId = %s and sr.SType = %s"
         re = SelectQuery(sql,(hotelid,results[x]["SType"]),one=False)
-        serviceReviewList.append((results[x]["SType"],re))
+        serviceReviewList.append((results[x]["SType"],results[x]["SCost"],re))
 
     hotelInfo["serviceReviews"] = serviceReviewList
 

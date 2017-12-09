@@ -96,10 +96,10 @@
                     {% if hotelInfo["service"]|count < 1 %}
                         : None
                     {% endif %}
-                    {% for s in hotelInfo["service"] %}
+                    {% for s in hotelInfo["serviceReviews"] %}
                     <div class="container tagHolder">
                         <span class="tag is-info">
-                            {{s["SType"]}} at ${{s["SCost"]}}
+                            {{s[0]}} at ${{s[1]}}
                         </span>
                         {% if hotelInfo["serviceReviews"]|count > 1 %}
                         <div class="container">
@@ -107,7 +107,7 @@
                             <div class="modal-background"></div>
                             <div class="modal-content">
                               <div class="box">
-                              {% for review in hotelInfo["serviceReviews"] %}
+                              {% for review in hotelInfo["serviceReviews"][2] %}
                                 <article class="media">
                                 <span class="tag">
                                     {{review["rate"]}}
