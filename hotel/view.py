@@ -539,12 +539,68 @@ def payment():
     response = make_response(render_template('search.html'))
     response.set_cookie('Checkout','',expires=0)
     return response
+@app.route('/stats',methods =['GET','POST'])
+def stastics():
+
+    if request.method == 'POST':
+        print ("got here")
+        to_date = request.form['todate1']
+        form_date = request.form['fromdate1']
+        queryval = request.form['query']
+        query1 = ""
+        #Highest rated room time for each hotel
+        if queryval == 'hr':
+            query1 = """SELECT dat.hotelid,dat.type FROM
+                    (SELECT rev.HotelId,max(rev.rating),room.type FROM Reservation res
+                    INNER JOIN Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s and r.outdate between %s and %s 
+                    INNER JOIN Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
+                    INNER JOIN RoomReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
+                    Room room on rev.HotelId = room.Hotelid AND rreview.roomno = room.roomno GROUP BY rev.hotelid) as dat"""
+        elif queryval == 'sr':
+            query1 = """
+                    SELECT dat.hotelid,dat.type from 
+                            (SELECT rev.HotelId,max(rev.rating) as rate,s.Stype as type FROM Reservation res
+                            INNER JOIN 
+                            Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND  r.outdate between %s and %s 
+                            INNER JOIN 
+                            Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
+                            INNER JOIN ServiceReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
+                            Service s on rev.HotelId = s.Hotelid  GROUP BY rev.hotelid) as dat"""
+        elif queryval == 'br':
+
+            query1 = """
+                    SELECT dat.hotelid,dat.type from 
+                            (SELECT rev.HotelId,max(rev.rating) as rate,b.BType as type FROM Reservation res
+                            INNER JOIN 
+                            Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND r.outdate between %s and %s 
+                            INNER JOIN 
+                            Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
+                            INNER JOIN BreakfastReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
+                            Breakfast  b on rev.HotelId = b.Hotelid  GROUP BY rev.hotelid) as dat"""
+        else:
+            query1 = """
+                        SELECT c.name,sum(r.totalamt) as x FROM Reservation r INNER JOIN Customer c on r.cid = c.cid INNER JOIN Reserves re on re.hotelid = r.hotelid 
+                        and re.indate between %s and %s and re.outdate between %s and %s GROUP BY r.cid ORDER BY x ASC
+                    """
+        
 
 
+        restultsquery1 = SelectQuery(query1,(form_date,to_date,form_date,to_date),one = False)
+        lis = []
+        if queryval == "bestc":
+            ctr = 1
+            for i in restultsquery1:
 
-
-
-
-@app.route('/registerhotel', methods=['POST'])
-def register_hotel():
-    pass
+                lis.append(i)
+                if(ctr == 5):
+                    break
+                ctr +=1
+        
+        print(restultsquery1)
+        val = None
+        if len(restultsquery1) ==0:
+            print ("rip")
+            val = "Enter a valid date range"
+        return render_template("statstics.html",result = restultsquery1,vali=val,bestc = lis)
+    else:
+        return render_template("statstics.html")
