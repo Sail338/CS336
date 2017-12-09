@@ -75,7 +75,7 @@
         <h4>Payment Method</h4>
         {% if cc %}
           {% for card in creditCards %}
-            <input type="radio" name="card" value='{{CNumber}}'>{{card['CNumber']}}   {{card['ExpDate']}}<br><br>
+            <input type="radio" name="card" value='{{CNumber}}' required>{{card['CNumber']}}   {{card['ExpDate']}}<br><br>
           {% endfor %}
         {% endif %}
         <input type="radio" name="card" value="new">Add a card</p>

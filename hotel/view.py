@@ -288,10 +288,10 @@ def hotel_page():
     #return (val['results']['country'])
     entry = val["results"]["entry"]
     depart = val["results"]["depart"]
-    sqlst = "SELECT * FROM Room r1  WHERE r1.HotelId = %s AND r1.price >%s and r1.price <%s AND NOT EXISTS (SELECT * FROM Reserves res WHERE res.HotelID = r1.HotelID and res.RoomNo = r1.RoomNo and %s between res.InDate and res.OutDate and %s between res.InDate and res.OutDate) "
-    results = SelectQuery(sqlst,(val["id"],val["results"]["min"],val["results"]["max"],entry,depart),one= False)
-    sqlst = "SELECT *,o.Discount as dis FROM Room r1, Offerroom o WHERE r1.HotelId = %s and r1.price >%s and r1.price <%s AND NOT EXISTS (SELECT * FROM Reserves res WHERE res.HotelID = r1.HotelID and res.RoomNo = r1.RoomNo and %s between res.InDate and res.OutDate and %s between res.InDate and res.OutDate) and r1.HotelId = o.HotelId and r1.RoomNo = o.RoomNo  and %s between o.SDate and o.EDate and %s between o.SDate and o.EDate"
-    results2 = SelectQuery(sqlst,(val["id"],val["results"]["min"],val["results"]["max"],entry,depart,entry,depart),one= False)
+    sqlst = "SELECT * FROM Room r1  WHERE r1.HotelId = %s AND r1.price >%s and r1.price <%s AND NOT EXISTS (SELECT * FROM Reserves res WHERE res.HotelID = r1.HotelID and res.RoomNo = r1.RoomNo and (%s between res.InDate and res.OutDate or %s between res.InDate and res.OutDate or (%s <= res.InDate and %s >= res.OutDate))) "
+    results = SelectQuery(sqlst,(val["id"],val["results"]["min"],val["results"]["max"],entry,depart,entry,depart),one= False)
+    sqlst = "SELECT *,o.Discount as dis FROM Room r1, Offerroom o WHERE r1.HotelId = %s and r1.price >%s and r1.price <%s AND NOT EXISTS (SELECT * FROM Reserves res WHERE res.HotelID = r1.HotelID and res.RoomNo = r1.RoomNo and (%s between res.InDate and res.OutDate or %s between res.InDate and res.OutDate or (%s <= res.InDate and %s >= res.OutDate))) and r1.HotelId = o.HotelId and r1.RoomNo = o.RoomNo  and %s between o.SDate and o.EDate and %s between o.SDate and o.EDate"
+    results2 = SelectQuery(sqlst,(val["id"],val["results"]["min"],val["results"]["max"],entry,depart,entry,depart,entry,depart),one= False)
     if len(results2) == 0:
         for i in range(0,len(results)):
             results[i]["Discount"] = 0
@@ -379,12 +379,9 @@ def add_to_checkout():
         checkoutList = request.form.getlist('add_check')
         listOfRooms = []
         for x in checkoutList:
-            print(x)
             listOfRooms.append(json.loads(x))
         if checkout:
             checkout = json.loads(checkout)
-            print(checkout[0]['id'])
-            print(listOfRooms[0]['id'])
             if checkout[0]['id'] != listOfRooms[0]['id']:
                 return render_template("search.html")
             for y in listOfRooms:
@@ -398,7 +395,7 @@ def add_to_checkout():
             response.set_cookie('Checkout', listOfRooms)
         return response
     else:
-        #return registration htmls
+        #return the user to the registration html
         pass
 
 @app.route('/checkout', methods=["GET","POST"])
@@ -498,13 +495,11 @@ def checkout():
                 if len(creditCards) == 0:
                     cc=False
 
-                #NEED TO ADD TO RESERVATION WHEN THEY MAKE PAYMENT, ADD ALL THE ROOM TO ROOM RESERVES!!!!!
                 return render_template("checkout.html",CL=listOfData,total=total,cc=cc,creditCards=creditCards,initial=False)
 
 
 @app.route('/payment', methods=['POST'])
 def payment():
-    print("In here")
     user_id = 2
     checkout = json.loads(request.cookies.get('Checkout'))
     whatCard = request.form['card']
@@ -513,6 +508,8 @@ def payment():
         bAddr = request.form['ba']
         sCode = request.form['sc']
         tCard = request.form['dc']
+        if not(cNum and bAddr and sCode and tCard):
+            return render_template("search.html")
         expDate = request.form['ed']
         #user_id = request.cookies.get('Session')
         name = SelectQuery("SELECT Name FROM Customer WHERE Customer.Cid = %s",(user_id))
@@ -521,7 +518,6 @@ def payment():
             InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(user_id,cNum,bAddr,name,sCode,tCard,expDate))
         except:
             return render_template("search.html")
-
 
 
     hotelId = checkout[0]['id']
@@ -540,7 +536,9 @@ def payment():
         delta = (d2-d1).days
         InsertQuery("INSERT INTO Reserves VALUES (%s,%s,%s,%s,%s,%s)",(invoiceNo,x['depart'],x['entry'],x['roomNo'],delta,hotelId))
 
-    return render_template("search.html")
+    response = make_response(render_template('search.html'))
+    response.set_cookie('Checkout','',expires=0)
+    return response
 
 
 
