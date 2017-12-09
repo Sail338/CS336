@@ -2,6 +2,7 @@ import pymysql
 import hotel.config as config
 import names
 import random as rand
+import datetime
 def connect():
     """
         Connects to the databse

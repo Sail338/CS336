@@ -1,8 +1,10 @@
+
 from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from hotel import app
 from hotel.util import isNum, buildCheckoutData, InsertQuery, InsertQueryKV, SelectQuery, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
 import hashlib
 import json
+import datetime
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -381,6 +383,10 @@ def add_to_checkout():
             listOfRooms.append(json.loads(x))
         if checkout:
             checkout = json.loads(checkout)
+            print(checkout[0]['id'])
+            print(listOfRooms[0]['id'])
+            if checkout[0]['id'] != listOfRooms[0]['id']:
+                return render_template("search.html")
             for y in listOfRooms:
                 if y in checkout:
                     continue
@@ -403,7 +409,6 @@ def checkout():
     if request.method == 'GET':
         if user_id:
             listInCheckout = buildCheckoutData(checkout)
-
             return render_template("checkout.html",CL=listInCheckout,initial="True")
         else:
             #reroute to register
@@ -437,11 +442,10 @@ def checkout():
                 total = 0
                 trueCap = 0
                 for x in listOfData:
-                    total += x['Price'] - (x['Price'] * x['discount'])
+                    total += x['Price'] - (x['Price'] * (int(x['discount'])/100))
                     trueCap += x['Capacity']
                 if cap > trueCap:
                     return render_template("checkout.html",CL=listOfData,initial=True,capError2=True)
-
 
                 allB = request.form.getlist("bnum")
                 if "" in allB:
@@ -495,12 +499,14 @@ def checkout():
                     cc=False
 
                 #NEED TO ADD TO RESERVATION WHEN THEY MAKE PAYMENT, ADD ALL THE ROOM TO ROOM RESERVES!!!!!
-
                 return render_template("checkout.html",CL=listOfData,total=total,cc=cc,creditCards=creditCards,initial=False)
 
 
 @app.route('/payment', methods=['POST'])
 def payment():
+    print("In here")
+    user_id = 2
+    checkout = json.loads(request.cookies.get('Checkout'))
     whatCard = request.form['card']
     if whatCard == "new":
         cNum = request.form['cn']
@@ -509,7 +515,6 @@ def payment():
         tCard = request.form['dc']
         expDate = request.form['ed']
         #user_id = request.cookies.get('Session')
-        user_id = 2
         name = SelectQuery("SELECT Name FROM Customer WHERE Customer.Cid = %s",(user_id))
         name = name['Name']
         try:
@@ -517,17 +522,25 @@ def payment():
         except:
             return render_template("search.html")
 
-    #Now we gotta put this thank in RESERVATION
-    current = request.cookies.get("Checkout")
-    checkout = []
-    while x in current:
-        checkout.append(json.loads(x))
-        total = request.form['payment']
-        invoiceNo = SelectQuery("Select MAX(InvoiceNo) as iNo FROM Reservation")
-        invoiceNo = invoiceNo['iNo']
-        #Fill In later
-        InsertQuery("INSERT INTO RESERVATION VALUES (%s,%s,%s,%s,%s)",(invoiceNo,user_id,None,None,total))
 
+
+    hotelId = checkout[0]['id']
+    total = request.form['payment']
+    invoiceNo = SelectQuery("Select MAX(InvoiceNo) as ino FROM Reservation")
+    if invoiceNo['ino'] == None:
+        invoiceNo = 0
+    else:
+        invoiceNo = int(invoiceNo['ino']) + 1
+    #Fill In later
+    now = datetime.datetime.now()
+    InsertQuery("INSERT INTO Reservation VALUES (%s,%s,%s,%s,%s)",(invoiceNo,user_id,now,hotelId,total))
+    for x in checkout:
+        d1 = datetime.datetime.strptime(x['entry'], "%Y-%m-%d")
+        d2 = datetime.datetime.strptime(x['depart'], "%Y-%m-%d")
+        delta = (d2-d1).days
+        InsertQuery("INSERT INTO Reserves VALUES (%s,%s,%s,%s,%s,%s)",(invoiceNo,x['depart'],x['entry'],x['roomNo'],delta,hotelId))
+
+    return render_template("search.html")
 
 
 
