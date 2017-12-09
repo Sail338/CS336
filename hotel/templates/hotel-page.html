@@ -57,7 +57,7 @@
 
                 <div class="container is-grouped is-grouped-centered">
                     <p><b>Breakfast Options</b>
-                    {% if hotelInfo["breakfast"]|count < 1 %}
+                    {% if hotelInfo["breakfastReviews"]|count < 1 %}
                         : None
                     {% endif %}
 
@@ -96,13 +96,13 @@
                           </div>
                         </div>
                     </div>
-                    </p>
+                    
                     {% endfor %}
                 </div>
 
                 <div class="container is-grouped is-grouped-centered">
                     <p><b>Service Options</b></p>
-                    {% if hotelInfo["service"]|count < 1 %}
+                    {% if hotelInfo["serviceReviews"]|count < 1 %}
                         : None
                     {% endif %}
                     {% for s in hotelInfo["serviceReviews"] %}
