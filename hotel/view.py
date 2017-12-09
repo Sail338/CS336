@@ -556,6 +556,7 @@ def payment():
 def stastics():
 
     if request.method == 'POST':
+        error = []
         print ("got here")
         to_date = request.form['todate1']
         form_date = request.form['fromdate1']
@@ -608,12 +609,19 @@ def stastics():
                 if(ctr == 5):
                     break
                 ctr +=1
-        
+
+        if to_date == '' or form_date == '':
+            error.append("Please input dates")
+        else:
+            datetimefrom = datetime.datetime.strptime(form_date,"%Y-%m-%d")
+            datetimeto = datetime.datetime.strptime(to_date,"%Y-%m-%d")
+            if datetimeto < datetimefrom:
+                error.append("Please make the to date after the from date")
         print(restultsquery1)
-        val = None
         if len(restultsquery1) ==0:
-            print ("rip")
-            val = "Enter a valid date range"
+            error.append("The date had no results, please try inputting a different date range")
+        if error:
+            return render_template("statstics.html",error = error)
         return render_template("statstics.html",result = restultsquery1,vali=val,bestc = lis)
     else:
         return render_template("statstics.html")
