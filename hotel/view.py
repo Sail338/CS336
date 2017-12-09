@@ -170,6 +170,15 @@ def search():
     depart = request.form['depart']
     print(depart)
     minCost = request.form['min']
+    if entry == '' or depart == '':
+        error.append("Please input a check in and checkout date")
+    else:
+        dtparsed = datetime.datetime.strptime(entry,'%Y-%m-%d')
+        dtparsed2 = datetime.datetime.strptime(depart,'%Y-%d-%m')
+        if dtparsed2 < dtparsed:
+            error.append("Please make checkout date AFTER the entry date")
+        if dtparsed < datetime.datetime.now():
+            error.append("Please Input a time befroe today to checkin lol")
     if minCost == "" or minCost == None:
         minCost = 0
         val['min'] = 0
@@ -209,7 +218,7 @@ def search():
     else:
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
 
-
+    
 
 
     if error:
