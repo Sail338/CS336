@@ -152,30 +152,7 @@ def buildQueryServiceBreakfasts(slist,blist):
     base += "GROUP BY h1.hotelid"
     return base
 
-def buildCheckoutData(checkout):
-    listInCheckout = []
-    for x in checkout:
-        hotelid = x["id"]
-        roomNo = x["roomNo"]
-        entry = x["entry"]
-        depart = x["depart"]
-        print(depart)
-        discount = x["discount"]
-        sql = "SELECT * FROM Room , Hotel WHERE Room.HotelId = %s and Room.RoomNo = %s"
-        results = SelectQuery(sql,(hotelid,roomNo),one=True)
-        results["discount"] = results['Price'] * (discount/100)
-        results["entry"] = entry
-        results["depart"] = depart
-        listOfB = []
-        sql = "SELECT BType, BPrice FROM Breakfast WHERE Breakfast.HotelId = %s"
-        re = SelectQuery(sql,(hotelid),one=False)
-        results["breakfasts"] = re
-        listOfS = []
-        sql = "SELECT SType, SCost FROM Service WHERE Service.HotelId = %s"
-        re = SelectQuery(sql,(hotelid),one=False)
-        results["services"] = re
-        listInCheckout.append(results)
-    return listInCheckout
+
 
 
 def genRandomReservaton():
@@ -194,12 +171,12 @@ def genRandomReservaton():
         hotel = rand.randint(0,99)
         datetime = str(yr) + '-'+ str(month) + '-'+ str(day) + str(time)
         totalamt = rand.randint(1000,3000)
-        InsertQuery("INSERT into Reservation VALUES (%s,%s,%s,%s,%s)",(invoiceno,i,datetime,hotel,totalamt)) 
+        InsertQuery("INSERT into Reservation VALUES (%s,%s,%s,%s,%s)",(invoiceno,i,datetime,hotel,totalamt))
         #pick 30 random rooms
-        
+
         li = [k for k in range(1,61)]
         for j in range(rand.randint(10,30)):
-            
+
             room = li[rand.randint(0,len(li)-1)]
             tup = (hotel,room)
             for l in taken:
@@ -227,9 +204,9 @@ def genRandomReservaton():
                 if outmonth > 12:
                     outmonth = 1
                     outyear += 1
-            indate = str(inyear) + '-' + str(inmonth) + '-' + str(inday) + time 
+            indate = str(inyear) + '-' + str(inmonth) + '-' + str(inday) + time
             outdate = str(outyear) + '-' + str(outmonth) + '-' + str(outday) + time
-            InsertQuery("INSERT Into Reserves VALUES (%s,%s,%s,%s,%s,%s)",(invoiceno,outdate,indate,room,outdaynodays,hotel))  
+            InsertQuery("INSERT Into Reserves VALUES (%s,%s,%s,%s,%s,%s)",(invoiceno,outdate,indate,room,outdaynodays,hotel))
             #now we generate roomreview
             comments = ['This was great','This was ok','Best service','Amazing beds','Gordon Ramsay should do a hotel hell','There were so many bed bugs wtf','Would not reccomend']
             gen_randomindex = rand.randint(0,len(comments)-1)
@@ -250,7 +227,7 @@ def genRandomReservaton():
         commentsb = ['Great Food',"amazing","10/10 would go again","horrible","bland","raw!"]
         commentss = ["quality service","had lots of fun","kids enjoyed","generic","was not amused","I almost died"]
         randno = rand.randint(1,len(bfarry))
-        
+
         for z in range(0,randno):
             gen_randomindexbf = rand.randint(0,len(commentsb)-1)
             ratingb = 0
@@ -258,13 +235,13 @@ def genRandomReservaton():
                 ratingb= rand.randint(3,5)
             else:
                 ratingb = rand.randint(0,3)
-            
+
             reviewid = SelectQuery("SELECT max(reviewid) as rev FROM Review")
             if reviewid['rev'] == None:
                reviewid = 0
             else:
                reviewid = int(reviewid['rev']) +1
-            InsertQuery("INSERT INTO Review VALUES (%s,%s,%s,%s,%s)",(reviewid,hotel,i,commentsb[gen_randomindexbf],ratingb)) 
+            InsertQuery("INSERT INTO Review VALUES (%s,%s,%s,%s,%s)",(reviewid,hotel,i,commentsb[gen_randomindexbf],ratingb))
             InsertQuery("INSERT INTO BreakfastReview VALUES (%s,%s,%s)",(reviewid,bfarry[z]['BType'],hotel))
         randnoser  = rand.randint(1,len(servicesarray))
         for service in range(0,randnoser):
@@ -275,27 +252,27 @@ def genRandomReservaton():
                 ratings= rand.randint(3,5)
             else:
                 ratings = rand.randint(0,3)
-            
+
             reviewid = SelectQuery("SELECT max(reviewid) as rev FROM Review")
             if reviewid['rev'] == None:
                reviewid = 0
             else:
                reviewid = int(reviewid['rev']) +1
-            InsertQuery("INSERT INTO Review VALUES (%s,%s,%s,%s,%s)",(reviewid,hotel,i,commentss[gen_randomindexservice],ratings)) 
+            InsertQuery("INSERT INTO Review VALUES (%s,%s,%s,%s,%s)",(reviewid,hotel,i,commentss[gen_randomindexservice],ratings))
             InsertQuery ("INSERT INTO ServiceReview VALUES (%s,%s,%s)",(reviewid,servicesarray[service]['SType'],hotel))
 
-            
-        
-            
-            
-
-
-            
-  
 
 
 
-        
+
+
+
+
+
+
+
+
+
 
 def genServices():
     bfarr = ['Pool','Jaqcuuzi','Gym','Maid','Coference rooom','Casino','Track']
@@ -358,6 +335,7 @@ def buildQueryServiceBreakfasts(slist,blist):
     base += "GROUP BY h1.hotelid"
     return base
 
+
 def buildCheckoutData(checkout):
     listInCheckout = []
     for x in checkout:
@@ -365,9 +343,8 @@ def buildCheckoutData(checkout):
         roomNo = x["roomNo"]
         entry = x["entry"]
         depart = x["depart"]
-        print(depart)
         discount = x["discount"]
-        sql = "SELECT * FROM Room , Hotel WHERE Room.HotelId = %s and Room.RoomNo = %s"
+        sql = "SELECT * FROM Room INNER JOIN Hotel ON Room.HotelId = Hotel.HotelId WHERE Room.HotelId = %s and Room.RoomNo = %s"
         results = SelectQuery(sql,(hotelid,roomNo),one=True)
         results["discount"] = results['Price'] * (discount/100)
         results["entry"] = entry

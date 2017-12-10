@@ -176,7 +176,7 @@ def search():
     if entry == '' or depart == '':
         error.append("Please input a check in and checkout date")
     else:
-    
+
         dtparsed = datetime.datetime.strptime(entry,'%Y-%m-%d')
 
         dtparsed2 = datetime.datetime.strptime(depart,'%Y-%m-%d')
@@ -223,7 +223,7 @@ def search():
     else:
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
 
-    
+
 
 
     if error:
@@ -427,7 +427,6 @@ def checkout():
     elif request.method == 'POST':
         #user_id = request.cookies.get('Session')
         user_id = 2
-        checkout = json.loads(request.cookies.get('Checkout'))
         try:
             remove = request.form["remove"]
         except:
@@ -567,37 +566,37 @@ def stastics():
         if queryval == 'hr':
             query1 = """SELECT dat.hotelid,dat.type FROM
                     (SELECT rev.HotelId,max(rev.rating),room.type FROM Reservation res
-                    INNER JOIN Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s and r.outdate between %s and %s 
+                    INNER JOIN Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s and r.outdate between %s and %s
                     INNER JOIN Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
                     INNER JOIN RoomReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
                     Room room on rev.HotelId = room.Hotelid AND rreview.roomno = room.roomno GROUP BY rev.hotelid) as dat"""
         elif queryval == 'sr':
             query1 = """
-                    SELECT dat.hotelid,dat.type from 
+                    SELECT dat.hotelid,dat.type from
                             (SELECT rev.HotelId,max(rev.rating) as rate,s.Stype as type FROM Reservation res
-                            INNER JOIN 
-                            Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND  r.outdate between %s and %s 
-                            INNER JOIN 
+                            INNER JOIN
+                            Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND  r.outdate between %s and %s
+                            INNER JOIN
                             Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
                             INNER JOIN ServiceReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
                             Service s on rev.HotelId = s.Hotelid  GROUP BY rev.hotelid) as dat"""
         elif queryval == 'br':
 
             query1 = """
-                    SELECT dat.hotelid,dat.type from 
+                    SELECT dat.hotelid,dat.type from
                             (SELECT rev.HotelId,max(rev.rating) as rate,b.BType as type FROM Reservation res
-                            INNER JOIN 
-                            Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND r.outdate between %s and %s 
-                            INNER JOIN 
+                            INNER JOIN
+                            Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND r.outdate between %s and %s
+                            INNER JOIN
                             Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
                             INNER JOIN BreakfastReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
                             Breakfast  b on rev.HotelId = b.Hotelid  GROUP BY rev.hotelid) as dat"""
         else:
             query1 = """
-                        SELECT c.name,sum(r.totalamt) as x FROM Reservation r INNER JOIN Customer c on r.cid = c.cid INNER JOIN Reserves re on re.hotelid = r.hotelid 
+                        SELECT c.name,sum(r.totalamt) as x FROM Reservation r INNER JOIN Customer c on r.cid = c.cid INNER JOIN Reserves re on re.hotelid = r.hotelid
                         and re.indate between %s and %s and re.outdate between %s and %s GROUP BY r.cid ORDER BY x ASC
                     """
-        
+
 
 
         restultsquery1 = SelectQuery(query1,(form_date,to_date,form_date,to_date),one = False)
