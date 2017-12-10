@@ -170,10 +170,11 @@ def search():
     depart = request.form['depart']
     print(depart)
     minCost = request.form['min']
-    if entry == '' or depart == '':
-        error.append("Please input a check in and checkout date")
     if states == '' or countries == '':
         error.append("Please input a valid state or country")
+
+    if entry == '' or depart == '':
+        error.append("Please input a check in and checkout date")
     else:
 
         dtparsed = datetime.datetime.strptime(entry,'%Y-%m-%d')
