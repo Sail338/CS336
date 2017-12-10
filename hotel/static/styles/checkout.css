@@ -5,3 +5,15 @@
 	max-width: 50px!important;
 	max-height: 20px!important;
 }
+.header-image {
+    background-image: url(../photos/checkout.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #999;
+}
+.box {
+	
+	background: rgba(255, 255, 255, 0.85);
+}
