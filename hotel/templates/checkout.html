@@ -2,10 +2,129 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>title</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Checkout</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/checkout.css') }}">
+
   </head>
   <body>
-    {% if capError1 %}
+
+  <section class="hero is-dark is-fullheight header-image">
+
+    <div class="hero-head">
+      <nav class="navbar">
+        <div class="container">
+
+          <div id="navbarMenuHeroA" class="navbar-menu">
+            <div class="navbar-end">
+              <a href="account.html" class="navbar-item">
+                Profile
+              </a>
+              <a href="dashboard.html" class="navbar-item">
+                Dashboard
+              </a>
+              <a href='/search-page' class="navbar-item">
+                Search
+              </a>
+              <a href="/checkout" class="navbar-item" method="Get">
+                Checkout
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div style="margin-top: 20px;" class="container has-text-centered">
+          <h1 class="title is-large">
+            Just a few more questions before making your Reservation!
+          </h1>
+          <h2 class="subtitle">
+            Please choose any additional items you would like
+          </h2>
+      </div>
+
+    </div>
+
+    <div class="hero-body">
+      {% if capError1 %}
+      <h3>Capacity entered is not a number!</h3>
+      {% endif %}
+      {% if capError2 %}
+      <h3>Capacity entered is too large for current reservation!</h3>
+      {% endif %}
+      {% if valError %}
+      <h3>One or more of your breakfast/service amounts are invalid numbers!</h3>
+      {% endif %}
+      <form action="/checkout" method="POST">
+        <div class="container">
+        {% for item in CL %}
+        <div class="box">
+          <div class="has-text-centered">
+            <h3 class="title is-3 titleColored"> {{item['Street']}} {{item['State']}} {{item['City']}} {{item['Zip']}}</h3>
+            <h4 class="subtitle is-4 titleColored">Room Number: {{item['RoomNo']}} | Floor: {{item["FloorNo"]}} |  Room Type: {{item['Type']}}  | Capacity: {{item['Capacity']}}</h4>
+            <h5 class="subtitle is-5 titleColored"> 
+            {% if item['discount'] != 0 %}
+              Discount! New Price is: {{item['Price'] - item['discount']}}
+            {% else %}
+              Standard Price: {{item['Price']}}
+            {% endif %}
+            </h5>
+          </div>
+
+            <br>
+            <div class="columns">
+              
+              <div class="column is-4 is-offset-2">
+                {% if item['services']|length != 0 %}
+                <p><b><u>Service Options</u></b></p>
+                {% endif %}
+                {% for sf in item['services'] %}
+                  <label class="checkbox">
+                    <input value='{"SType":"{{sf['SType']}}","HotelId":{{item['HotelId']}},"RoomNo":{{item['RoomNo']}}}' type="checkbox" name="sChoose">
+                    {{sf['SType']}} at ${{sf['SCost']}}
+                  </label>
+
+                  <br>
+                {% endfor %}
+              </div>
+              <div class="column is-4 is-offset-1">
+                {% if item['breakfasts']|length != 0 %}
+                <p><b><u>Breakfast Options</u></b></p>
+                {% endif %}
+                {% for bf in item['breakfasts'] %}
+                <div class="control">
+                  <input class="input brekOp" value=1 type="text" name="bnum">  {{bf['BType']}} at ${{bf['BPrice']}}
+                </div>
+
+                {% endfor %}
+              </div>
+
+            </div>
+            <div class="has-text-centered">
+            <button class="button" type="submit" name = "remove" value='{"id":{{item['HotelId']}},"roomNo":{{item['RoomNo']}}}'>Remove</button>
+            </div>
+        </div>
+        {% endfor %}
+
+
+        </div>
+        <br><br>
+        <div class="has-text-centered">
+        <h4 class="subtitle is-4"> How many guests do you have?</h4> <input class="input" type="text" name="cap">
+        <br><br><button class="button" type="submit" value='reserve'>Finish</button>
+        </div>
+
+      </form>
+    </div>
+
+  </section>
+
+
+<!--     {% if capError1 %}
       <h3>Capacity entered is not a number!</h3>
     {% endif %}
     {% if capError2 %}
@@ -27,24 +146,27 @@
             {% if item['discount'] != 0 %}
               <p>Discount! New Price is: {{item['Price'] - item['discount']}}</p>
             {% endif %}
+
             {% if item['breakfasts']|length != 0 %}
             <p>Breakfast Options</p>
             {% endif %}
             {% for bf in item['breakfasts'] %}
               <input value=1 type="text" name="bnum">  * {{bf['BType']}} at ${{bf['BPrice']}}<br>
             {% endfor %}
+
             {% if item['services']|length != 0 %}
             <br><p>Service Options</p>
             {% endif %}
             {% for sf in item['services'] %}
               <input value='{"SType":"{{sf['SType']}}","HotelId":{{item['HotelId']}},"RoomNo":{{item['RoomNo']}}}' type="checkbox" name="sChoose">{{sf['SType']}} at ${{sf['SCost']}}<br>
             {% endfor %}
+
             <button type="submit" name = "remove" value='{"id":{{item['HotelId']}},"roomNo":{{item['RoomNo']}}}'>Remove</button>
           <br><br>
         {% endfor %}
         <button type="submit" value='reserve'>Finish</button>
       </form>
-      {% else %}
+ -->      {% else %}
       <h3>Transaction</h4>
       <h5>Total: ${{total}}</h5>
       <h5>Following items Summed:</h5>
@@ -88,4 +210,6 @@
       </form>
     {% endif %}
   </body>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </html>
