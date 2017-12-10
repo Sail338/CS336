@@ -1,7 +1,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from hotel import app
-from hotel.util import isNum, buildCheckoutData, InsertQuery, InsertQueryKV, SelectQuery, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts
+from hotel.util import isNum, buildCheckoutData, InsertQuery, InsertQueryKV, SelectQuery, SelectQueryKV, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts, ExecuteRaw
 import hashlib
 import json
 import datetime
@@ -286,11 +286,6 @@ def register_account():
 def register_page():
     # return registration page
     pass
-
-@app.route('/profile', methods=['GET'])
-def get_profile():
-    user = request.cookies.get('username')
-
 
 @app.route('/browse', methods=['GET'])
 def browse():

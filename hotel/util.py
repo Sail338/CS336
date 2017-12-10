@@ -46,12 +46,10 @@ def ExecuteRaw(query, fetch_one=False):
 
 def SelectQueryKV(table, columns="*", fields={}, fetch_one=False):
     query = "SELECT %s FROM %s" % (columns, table)
-    print(query)
     if len(fields) > 0:
         where_query = ' AND '.join(['{} = {}'.format(k, v if isinstance(v, int) or isinstance(v, float)
                                                           else '"%s"' % v) for k,v in fields.items()])
         query = '%s WHERE %s' % (query, where_query)
-    print("Q: ", query)
     conn = connect()
     with conn.cursor() as cursor:
         cursor.execute(query)
@@ -115,7 +113,6 @@ def creditcards():
             yr = rand.randint(10,39)
 
             ccnumber =  str(rand.randint(00000000,99999999))
-            print(ccnumber)
             ctype_ = ctype[rand.randint(0,1)]
             InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(i,ccnumber,addr,name,seccode,ctype_,str(month) + "/" + str(day) + "/" + str(yr)))
 

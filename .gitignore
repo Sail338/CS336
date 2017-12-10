@@ -1,5 +1,7 @@
 *.log
 *.pyc
+*.map
+*.sass-cache
 __pycache__
 *.yaml
 pip-selfcheck.json

@@ -1,30 +1,31 @@
 {% extends "dashboard-base.html" %}
 {% block content %}
     <div id='hotels-list'>
+        <div id='hotels-list-header bold'> Hotels Stayed </div>
         {% for hotel in hotels %}
             <div class='hotel-container'>
                 <div class='hotel-header'><p> {{ hotel.name }} </p></div>
                 <div class='hotel-rooms-container'>
                     {% for room in hotel.rooms %}
                         <div class='hotel-room'>
-                            <div class='room-no'><p> Room {{ room.roomNo }} </p></div>
+                            <div class='room-no bold'><p> Room {{ room.roomNo }} </p></div>
                             
                             <div class='room-price'><p> Price: {{ room.price }} </p></div>
-                            <div class='room-time'><p> Stayed from {{ room.checkIn }} to {{ room.checkOut }} </p></div>
-                            <div class='review-button'><p> Review </p></div>
+                            <div class='room-time'><p> Stayed from {{ room.checkIn }} to {{ room.checkOut }} </p><div class='review-button review'><p> Review </p></div></div>
                         </div>
+                        <div class='hotel-divider'></div>
                     {% endfor %}
                 </div>
                 <div class='services-list'>
-                    <div class='services-header'><p> Services </p></div>
+                    <div class='services-header bold'><p> Services </p></div>
                     {% for service in hotel.services %}
-                        <div class='service-item'><p>{{ service.stype }} - {{ service.price }}</p><a> Review </a></div>
+                        <div class='service-item'><p>{{ service.stype }} - {{ service.price }}</p><a class='review'> Review </a></div>
                     {% endfor %}
                 </div>
-                <div class='reservation-date'><p> Reservation Date: {{ hotel.resDate }} </p></div>
-                <div class='total-cost'><p> Total {{ hotel.total }} </p></div>
-                <div class='invoice-no'><p> Invoice: {{ hotel.invoiceNo }} </p></div>
-                <div class='review-hotel'><p> Review </p></div>
+                <div class='reservation-date'><p class='bold'> Reservation Date</p><p> {{ hotel.resDate }} </p></div>
+                <div class='total-cost'><p class='bold'> Total</p><p> {{ hotel.total }} </p></div>
+                <div class='invoice-no'><p class='bold'> Invoice</p><p> {{ hotel.invoiceNo }} </p></div>
+                <div class='review-hotel review'><p> Review Hotel </p></div>
             </div>
         {% endfor %}
     </div>

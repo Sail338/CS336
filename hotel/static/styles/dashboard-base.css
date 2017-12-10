@@ -1,0 +1,9 @@
+body, head, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; }
+
+#sidebar {
+  margin-left: 10px; }
+
+/*# sourceMappingURL=dashboard-base.css.map */

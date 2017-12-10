@@ -1,0 +1,71 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  background: #872ef4;
+  background-color: #872ef4; }
+
+#content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: row;
+  background: #ffffff;
+  background-color: #ffffff; }
+
+#hotels-list {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  overflow-x: auto;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-bottom: 0; }
+
+.service-item, .room-time, .reesrvation-date, .total-cost, .invoice-no, .reservation-date {
+  display: flex;
+  flex-flow: row; }
+
+.bold {
+  margin-right: 10px; }
+
+.room-no, .room-time, .room-price, .review-button {
+  font-size: 12px; }
+
+.review-button {
+  margin-left: 15px; }
+
+.hotel-divider {
+  width: 100%;
+  height: 1px;
+  background: #888888;
+  background-color: #888888; }
+
+.bold {
+  font-weight: bold; }
+
+.service-item, .room-time {
+  align-items: center; }
+
+.service-item a {
+  margin-left: 10px; }
+
+.review {
+  display: flex;
+  width: 60px;
+  height: 10px;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: white;
+  background: #872ef4;
+  font-size: 12px; }
+
+.review-hotel {
+  width: 100px; }
+
+/*# sourceMappingURL=dashboard.css.map */
