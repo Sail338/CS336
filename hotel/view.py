@@ -139,20 +139,30 @@ def profile():
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
     m = hashlib.sha1()
+    cid = request.get_cookie("Session")
     # password = m.update(request.form['password'].encode('utf-8').hexdigest())
     credit_cards = request.form # perform set operation to figure out which cards to add, update, and delete
-    print("KEYS", request.form.getlist('SecCode'))
-    print("VALUES", request.form.values)
+    billings = ['"%s"' % v for v in request.form.getlist("BillingAddr")]
+    names = ['"%s"' % v for v in request.form.getlist("Name")]
+    expires = ['"%s"' % v for v in request.form.getlist("ExpDate")]
+    seccodes = ['"%s"' % v for v in request.form.getlist("SecCode")]
+    types = ['"%s"' % v for v in request.form.getlist("Type")]
+    creditNumbers = ['"%s"' % v for v in request.form.getlist("CNumber")]
+    keys = ', '.join(["BillingAddr", "Name", "ExpDate", "SecCode", "Type", "CNumber"])
+    values = ', '.join([str((billings[i], names[i], expires[i], seccodes[i], types[i], creditNumbers[i])) for i in range(len(billings))])
+    deleteStatement = "DELETE FROM CreditCards WHERE Cid=%s" % cid
+    insertStatement = "INSERT INTO CreditCards (%s) VALUES %s" % (keys, values)
+    # ExecuteRaw(deleteStatement)
+    # ExecuteRaw(insertStatement)
+    print(deleteStatement)
+    print(insertStatement)
     return "OK"
 
 @app.route('/newUser', methods=['POST'])
 def newUser():
-    # We are so fucked
     accCid = "SELECT MAX(Cid)+1 as nCid from Account"
-    custCid = "SELECT MAX(Cid)+1 as nCid from Customer"
     accCid = ExecuteRaw(accCid, fetch_one=True)['nCid']
-    custCid = ExecuteRaw(custCid, fetch_one=True)['nCid']
-    nCid = accCid if accCid > custCid else custCid # fucked
+    nCid = accCid
     userData = {
         "Email": form['email'],
         "PhoneNo": form['phoneno'],
@@ -170,15 +180,12 @@ def newUser():
         "Cid": nCid
     }
 
-    # checks if email already in the database (this is fucked)
+    # checks if email already in the database
     accEmail = 'SELECT Email as email from Account WHERE Email="%s"' % form['email']
-    custEmail = 'SELECT Email as email from Customer WHERE Email="%s"' % form['email']
     accEmail = ExecuteRaw(accEmail, fetch_one=True)
-    custEmail = ExecuteRaw(custEmail, fetch_one=True)
-    if accEmail != None or custEmail != None: # Email already exists
+    if accEmail != None: # Email already exists
         return "Email already registered. Please go to the homepage and login."
     InsertQueryKV("Account", accountData)
-    InsertQueryKV("Customer", userData)
     response = make_response("200")
     return "Registration Success! Please return to the homepage and login"
 
