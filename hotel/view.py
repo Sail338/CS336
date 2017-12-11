@@ -10,11 +10,13 @@ def home():
 
 @app.route('/authorize', methods=['POST'])
 def authorize_credentials():
-    username = request.form['username']
+    m = hashlib.sha1()
+    username = request.form['email']
     print(username)
     password = request.form['password']
-    print(password)
-    info_correct = True
+    m.update(password.encode('utf-8'))
+    user = SelectQueryKV(table="Account", columns="Cid", fields={"Email": email, "Password": m.hexdigest()}, fetch_one=True)
+    info_correct = user != None
     #Check username and password in the database
     if info_correct:
         response = redirect(url_for("dashboard"))
@@ -25,6 +27,7 @@ def authorize_credentials():
         #So if there is a Session cookie then we can assume that the user already logged in
         #Otherwise they did not
         #This will contain checkout information as well
+        userid = user['Cid']
         response.set_cookie('Session', userid)
         return response
     else:
@@ -136,23 +139,14 @@ def profile():
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
     m = hashlib.sha1()
-    try:
-        password = m.update(request.form['password'].encode('utf-8').hexdigest())
-        update_cards = request.form['cards'] # perform set operation to figure out which cards to add, update, and delete
-        existing_cards = [] # getCreditCardsForUser(
-        update_card_nos = set([card['card_no'] for card in existing_cards])
-        existing_card_nos = set([card['card_no'] for card in update_card_nos])
-        add_cards = update_card_nos - existing_card_nos # add these cards to db
-        update_cards = update_card_nos & existing_card_nos # update these cards in db
-        remove_cards = existing_card_nos - update_card_nos # remove these cards in db
-        return "OK"
-    except:
-        return "ERROR"
+    # password = m.update(request.form['password'].encode('utf-8').hexdigest())
+    credit_cards = request.form # perform set operation to figure out which cards to add, update, and delete
+    print("KEYS", request.form.getlist('SecCode'))
+    print("VALUES", request.form.values)
+    return "OK"
 
 @app.route('/newUser', methods=['POST'])
 def newUser():
-    keys = request.form
-    form = request.form
     # We are so fucked
     accCid = "SELECT MAX(Cid)+1 as nCid from Account"
     custCid = "SELECT MAX(Cid)+1 as nCid from Customer"
@@ -182,12 +176,11 @@ def newUser():
     accEmail = ExecuteRaw(accEmail, fetch_one=True)
     custEmail = ExecuteRaw(custEmail, fetch_one=True)
     if accEmail != None or custEmail != None: # Email already exists
-        return "400"
+        return "Email already registered. Please go to the homepage and login."
     InsertQueryKV("Account", accountData)
     InsertQueryKV("Customer", userData)
     response = make_response("200")
-    response.set_cookie("cid", value=nCid)
-    return response
+    return "Registration Success! Please return to the homepage and login"
 
 @app.route("/search-page", methods=['GET'])
 def search_page():

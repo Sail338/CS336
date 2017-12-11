@@ -1,7 +1,7 @@
 {% extends "dashboard-base.html" %}
 {% block content %}
     <div id='profile'>
-        <form action='/profileedit'>
+        <form action='/profileedit' method='post'>
             <div class='section-header bold header'><p> Personal Information </p></div>
             <div id='personal-fields'>
                 {% for data in personal %}
@@ -13,13 +13,12 @@
                     {% for cc in ccs %}
                         <div class='creditcard'>
                             {% for ccf in cc %}
-                                <div class='ccfield'><p> {{ ccf[0] }} </p></div><div class='cc-field-value'><input type='text' name='cc[]{{ ccf[1] }}' value='{{ ccf[2] }}'></div>
+                                <div class='ccfield'><p> {{ ccf[0] }} </p></div><div class='cc-field-value'><input type='text' name='{{ ccf[1] }}' value='{{ ccf[2] }}'></div>
                             {% endfor %}
                         </div>
                         <div class='cc-divider'></div>
                     {% endfor %}
                 </div>
-            </div>
             <input type='submit' text='Submit' class='submit-button'>
         </form>
     </div>
