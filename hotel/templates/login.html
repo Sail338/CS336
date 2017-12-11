@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+		<script
+		  src="https://code.jquery.com/jquery-3.2.1.min.js"
+		  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		  crossorigin="anonymous"></script>
+        <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='styles/login.css') }}">
+    </head>
+    <body>
+        <div id='content'>
+            <input type='text' id='email-field' class='login-field' placeholder='Email'>
+            <input type='text' id='password-field' class='login-field' placeholder='Password'>
+            <div class='login-register'>
+                <div class='login-button' id='login'>
+                    <p> Login </p>
+                </div>
+                <div class='login-button' id='register'>
+                    <p> Register </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

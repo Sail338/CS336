@@ -32,8 +32,10 @@ def InsertQuery(query:str, x):
 
 def InsertQueryKV(table, fields):
     keys, values = [k for k in fields], [v for k,v in fields.items()]
-    insert = "INSERT INTO (%s) VALUES (%s)" % (table, ','.join(keys), ','.join(values))
+    print("FIELDS", fields)
+    insert = "INSERT INTO %s (%s) VALUES (%s)" % (table, ','.join(keys), ','.join(['"%s"' % str(v) if isinstance(v, str) else str(v) for v in values]))
     conn = connect()
+    print(insert)
     with conn.cursor() as cursor:
         cursor.execute(insert)
     conn.commit()

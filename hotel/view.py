@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from hotel import app
 from hotel.util import isNum, buildCheckoutData, InsertQuery, InsertQueryKV, SelectQuery, SelectQueryKV, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts, ExecuteRaw
@@ -85,6 +84,10 @@ class RoomR:
     def toDict(self):
         return self.__dict__
 
+@app.route("/login", methods=['GET'])
+def login():
+    return render_template("login.html")
+
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
     cid = request.args.get('cid')
@@ -145,6 +148,46 @@ def edit_profile():
         return "OK"
     except:
         return "ERROR"
+
+@app.route('/newUser', methods=['POST'])
+def newUser():
+    keys = request.form
+    form = request.form
+    # We are so fucked
+    accCid = "SELECT MAX(Cid)+1 as nCid from Account"
+    custCid = "SELECT MAX(Cid)+1 as nCid from Customer"
+    accCid = ExecuteRaw(accCid, fetch_one=True)['nCid']
+    custCid = ExecuteRaw(custCid, fetch_one=True)['nCid']
+    nCid = accCid if accCid > custCid else custCid # fucked
+    userData = {
+        "Email": form['email'],
+        "PhoneNo": form['phoneno'],
+        "Name": form['name'],
+        "Address": form['address'],
+        'Cid': nCid
+    }
+
+    m = hashlib.sha1()
+    m.update(form['password'].encode("utf-8"))
+    accountData = {
+        "Email": form['email'],
+        "Password": m.hexdigest(),
+        "Address": form['address'],
+        "Cid": nCid
+    }
+
+    # checks if email already in the database (this is fucked)
+    accEmail = 'SELECT Email as email from Account WHERE Email="%s"' % form['email']
+    custEmail = 'SELECT Email as email from Customer WHERE Email="%s"' % form['email']
+    accEmail = ExecuteRaw(accEmail, fetch_one=True)
+    custEmail = ExecuteRaw(custEmail, fetch_one=True)
+    if accEmail != None or custEmail != None: # Email already exists
+        return "400"
+    InsertQueryKV("Account", accountData)
+    InsertQueryKV("Customer", userData)
+    response = make_response("200")
+    response.set_cookie("cid", value=nCid)
+    return response
 
 @app.route("/search-page", methods=['GET'])
 def search_page():
