@@ -1,0 +1,36 @@
+<form action = "/stats" method = "POST">
+	<br>
+	<input type = "radio" name = "query" checked value = "hr">Highest Rated Room Type For Each Hotel <br>
+	<input type = "radio" name = "query" value = "sr"> Highest Rated Service Type For Each Hotel <br>
+	<input type = "radio" name = "query" value = "br"> Highest Rating Breakfast Type For Each Hote <br>
+	<input type = "radio" name= "query" value = "bestc"> Best 5 Customers <br>
+	  From:<br>
+ 		 <input type="date" name="fromdate1">
+   	  To:
+  		 <input type="date" name="todate1">
+	 <input type = "submit" value = "submit">
+   {% if error %}
+   	{% for x in error %}
+	<li>	{{x}} </li>
+	{% endfor %}
+	{% endif %}
+	 {% if bestc %}
+
+	 	{% for i in bestc %}
+			{{i['name']}} <br>
+		{% endfor %}
+	{% endif %}
+	 {% if result and bestc|length == 0 %}
+	 	
+	 	{%if result | length == 0%}
+			Try a different date range
+		{% else %}
+		<br>
+	 		{% for i in result %}
+			{% if i['type'] != None %}
+			{{i['hotelid']}} {{i['type']}} <br>
+			{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endif %}
+</form>
