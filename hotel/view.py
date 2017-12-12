@@ -500,6 +500,8 @@ def add_to_checkout():
     if user_id:
         checkoutList = request.form.getlist('add_check')
         listOfRooms = []
+        if not checkoutList:
+            return render_template("search.html")
         for x in checkoutList:
             listOfRooms.append(json.loads(x))
         if checkout:
