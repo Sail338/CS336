@@ -614,6 +614,7 @@ def payment():
     #Fill In later
     now = datetime.datetime.now()
     InsertQuery("INSERT INTO Reservation VALUES (%s,%s,%s,%s,%s)",(invoiceNo,user_id,now,hotelId,total))
+    InsertQuery("INSERT INTO CustomerReservationXRef VALUES (%s,%s)",(user_id,invoiceNo))
     InsertQuery("UPDATE Customer SET InvoiceNo=%s WHERE Customer.Cid = %s",(invoiceNo,user_id))
     for x in checkout:
         d1 = datetime.datetime.strptime(x['entry'], "%Y-%m-%d")
