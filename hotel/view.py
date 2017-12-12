@@ -699,7 +699,7 @@ def stastics():
         if len(restultsquery1) ==0:
             error.append("The date had no results, please try inputting a different date range")
         if error:
-            return render_template("statstics.html",error = error)
-        return render_template("statstics.html",result = restultsquery1,error=error,bestc = lis)
+            return render_template("statistics.html",error = error)
+        return render_template("statistics.html",result = restultsquery1,error=error,bestc = lis)
     else:
-        return render_template("statstics.html")
+        return render_template("statistics.html")
