@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Login</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/hotelPage.css') }}">
+
+
+</head>
+<body>
+	<section class="hero is-dark is-fullheight header-image">
+
+		<div class="hero-head">
+			<nav class="navbar">
+				<div class="container">
+
+					<div id="navbarMenuHeroA" class="navbar-menu">
+						<div class="navbar-end">
+							<a href="account.html" class="navbar-item">
+								Profile
+							</a>
+							<a href="dashboard.html" class="navbar-item">
+								Dashboard
+							</a>
+							<a href='/search-page' class="navbar-item">
+								Search
+							</a>
+							<a href="/checkout" class="navbar-item" method="Get">
+								Checkout
+							</a>
+						</div>
+					</div>
+				</div>
+			</nav>
+		</div>
+
+		<div class="hero-body">
+			<div class="container has-text-centered">
+				<h1 class="title is-large">
+					Statistics
+				</h1>
+				<h2 class="subtitle">
+					Want to learn about our hotels?
+				</h2>
+				<div class="box">
+				<!-- <div class="container"> -->
+				<form action = "/stats" method = "POST">
+					<div class="columns">
+						<div class="column is-half">
+							<div class="field">
+								<div class="control">
+									<label class="radio">
+										<input type = "radio" name = "query" checked value = "hr">
+										Highest Rated Room Type For Each Hotel
+									</label>
+									<br><br>
+									<label class="radio">
+										<input type = "radio" name = "query" value = "sr">
+										Highest Rated Service Type For Each Hotel
+									</label>
+									<br><br>
+									<label class="radio">
+										<input type = "radio" name = "query" value = "br">
+										Highest Rating Breakfast Type For Each Hotel
+									</label>
+									<br><br>
+									<label class="radio">
+										<input type = "radio" name = "query" value = "bestc">
+										Best 5 Customers
+									</label>
+								</div>
+
+							</div>
+						</div>
+						<div class="column is-half">
+							<div class="field">
+								<div class="control">
+									<label>
+										<b>From:</b>
+										<input class="input" type="date" name="fromdate1">
+									</label>
+									<br><br>
+									<label>
+										<b>To:</b>
+										<input class="input" type="date" name="todate1">
+									</label>
+									
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+
+					<button class="button" type = "submit" value = "submit"> Submit</button>
+					</form>
+					<!-- </div> -->
+
+				</div>
+
+					{% if error %}
+						<div class="box has-text-centered">
+				   		{% for x in error %}			   		
+				   			<p>	{{x}} </p>	
+						{% endfor %}
+						</div>
+					{% endif %}
+
+					{% if bestc %}
+						<div class="box has-text-centered">
+						<h2 class="title titleColored">Best Customers</h2>
+					 	{% for i in bestc %}
+							<p>{{i['name']}}</p>
+						{% endfor %}
+						</div>
+					{% endif %}
+
+					{% if result and bestc|length == 0 %}
+					 	{%if result | length == 0%}
+							<h2 class="title titleColored">Try a different date range</h2>
+						{% else %}
+							<div class="box has-text-centered titleColored">
+							<h2 class="title titleColored"> Results</h2>
+							<div class="columns">
+								<div class="column is-third">
+								<h5 class="title is-5 titleColored">Hotel ID</h5>
+								{% for i in result %}
+									{% if i['type'] != None %}
+										<p>{{i['hotelid']}}</p><br>
+									{% endif %}
+								{% endfor %}
+								</div>
+								<div class="column is-third">
+								<h5 class="title is-5 titleColored">Address</h5>
+								{% for i in result %}
+									{% if i['type'] != None %}
+										<p>{{i['street']}}, {{i['city']}}, {{i['country']}} {{i['zip']}}</p><br>
+									{% endif %}
+								{% endfor %}
+								</div>
+								<div class="column is-third">
+								<h5 class="title is-5 titleColored">Type</h5>
+								{% for i in result %}
+									{% if i['type'] != None %}
+										<p>{{i['type']}}</p><br>
+									{% endif %}
+								{% endfor %}
+								</div>
+							</div>
+							</div>
+						{% endif %}
+					{% endif %}
+				</div>
+
+
+			</div>
+		</div>
+
+
+	</section>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</html>

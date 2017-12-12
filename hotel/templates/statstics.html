@@ -28,7 +28,7 @@
 		<br>
 	 		{% for i in result %}
 			{% if i['type'] != None %}
-			{{i['hotelid']}} {{i['type']}} <br>
+			{{i['hotelid']}} {{i['street']}}, {{i['city']}}, {{i['country']}} {{i['zip']}}  {{i['type']}}  <br>
 			{% endif %}
 			{% endfor %}
 		{% endif %}
