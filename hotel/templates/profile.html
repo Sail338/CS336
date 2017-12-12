@@ -15,11 +15,19 @@
                             {% for ccf in cc %}
                                 <div class='ccfield'><p> {{ ccf[0] }} </p></div><div class='cc-field-value'><input type='text' name='{{ ccf[1] }}' value='{{ ccf[2] }}'></div>
                             {% endfor %}
+                            <div class='remove-cc'> <p> Remove Credit Card </p> </div>
+                            <div class='cc-divider'></div>
                         </div>
-                        <div class='cc-divider'></div>
                     {% endfor %}
                 </div>
             <input type='submit' text='Submit' class='submit-button'>
         </form>
     </div>
+    <script>
+    $(function () {
+        $(".remove-cc").click(function () {
+            $(this).parent().remove();
+        });
+    });
+    </script>
 {% endblock %}

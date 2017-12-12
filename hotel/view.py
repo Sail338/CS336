@@ -20,13 +20,6 @@ def authorize_credentials():
     #Check username and password in the database
     if info_correct:
         response = redirect(url_for("dashboard"))
-        #This cookie will be used to check if the person is signed in
-        #The way to check if a person is already signed in is to simply do the following
-        #username = request.cookies.get('Session')
-        #if username
-        #So if there is a Session cookie then we can assume that the user already logged in
-        #Otherwise they did not
-        #This will contain checkout information as well
         userid = user['Cid']
         response.set_cookie('Session', userid)
         return response
@@ -34,6 +27,19 @@ def authorize_credentials():
         print("Incorrect Information Given")
         return render_template('index.html',incorrect=True,logoff=False)
 
+@app.route("/review", methods=['GET'])
+def review():
+    title = request.args.get('title')
+    data = request.args.get('data')
+    dtype = data[0]
+    ext = data[1:]
+    if dtype == 'hotel':
+        pass
+    elif dtype == 'service':
+        pass
+    elif dtype == 'room':
+        pass
+    return "200"
 
 @app.route('/logoff', methods=['GET'])
 def logoff():
@@ -56,13 +62,14 @@ SELECT * FROM Service WHERE HotelId IN (Reservation.HotelId);
 SELECT * FROM Hotel WHERE HotelId IN (Reservation.HotelID);
 '''
 class HotelR:
-    def __init__(self, invoiceNo, hotelId, name, checkRes, rooms, services, total):
+    def __init__(self, invoiceNo, hotelId, name, checkRes, rooms, services, breakfasts, total):
         self.name = name
         self.invoiceNo = invoiceNo
         self.hotelId = hotelId
         self.resDate = str(checkRes)
         self.services = services
         self.rooms = rooms
+        self.breakfasts = breakfasts
         self.total = total
 
     def toDict(self):
@@ -87,6 +94,12 @@ class RoomR:
     def toDict(self):
         return self.__dict__
 
+class BreakfastR:
+    def __init__(self, btype, price, desc):
+        self.btype = btype
+        self.price = price
+        self.desc = desc
+
 @app.route("/login", methods=['GET'])
 def login():
     return render_template("login.html")
@@ -106,12 +119,14 @@ def dashboard():
         # fetches all rooms reserved in the reservation
         reserves = SelectQueryKV("Reserves", fields={"HotelId": hotelId, "InvoiceNo": invoiceNo})
         services = SelectQueryKV("Service", fields={"HotelId": hotelId})
+        breakfasts = SelectQueryKV("Breakfast", fields={"HotelId": hotelId})
         rooms = [RoomR(res['RoomNo'],
                  SelectQueryKV("Room", columns="Price", fields={"RoomNo": res['RoomNo'], "HotelId": hotelId}, fetch_one=True)['Price'],
                  res['InDate'], res['OutDate']) for res in reserves]
         services = [ServiceR(s['SType'], s['SCost']) for s in services]
-        name = '%s - %s, %s %s, %s %s' % (hotelId, hotel['Street'], hotel['City'], hotel['State'], hotel['Country'], hotel['Zip'])
-        hotels.append(HotelR(invoiceNo, hotelId, name, resDate, rooms, services, totalAmt))
+        breakfasts = [BreakfastR(b['BType'], b['BPrice'], b['Description']) for b in breakfasts]
+        name = '%s, %s %s, %s %s' % (hotel['Street'], hotel['City'], hotel['State'], hotel['Country'], hotel['Zip'])
+        hotels.append(HotelR(invoiceNo, hotelId, name, resDate, rooms, services, breakfasts, totalAmt))
     return render_template('dashboard.html', hotels=hotels)
 
 '''
@@ -125,38 +140,63 @@ Select * from CreditCards WHERE Cid = cid; (Credit Cards)
 '''
 @app.route("/profile", methods=['GET'])
 def profile():
-    cid = request.args.get('cid')
-    personalQuery = "SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = c.Cid"
+    cid = 2
+    personalQuery = "SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = %d and c.Cid = %d" % (cid,cid)
     personal = ExecuteRaw(personalQuery, fetch_one=True)
     personalKV = [(k, personal[k]) for k in ['Name', 'Email', 'Address', 'PhoneNo']]
     creditCards = SelectQueryKV("CreditCards", fields={"Cid": cid})
     creditCardsKV = [[((k,k, cc[k]) if isinstance(k, str) else (k[0], k[1], cc[k[1]])) for k in [('Credit Card Number', 'CNumber'), 'Name',
                                                                           ('Billing Address', 'BillingAddr'), ('CVV', 'SecCode'),
                                                                           'Type', ('Expires', 'ExpDate')]] for cc in creditCards]
-    print(creditCardsKV)
     return render_template("profile.html", personal=personalKV, ccs=creditCardsKV)
 
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
     m = hashlib.sha1()
-    cid = request.get_cookie("Session")
+    cid = 2
+    updates = {
+        "Name": request.form['Name'],
+        "Address": request.form['Address'],
+        "Email": request.form['Email'],
+        "PhoneNo": request.form['PhoneNo']
+    }
+
+    security = {
+        "Email": request.form["Email"],
+        "Address": request.form['Address']
+    }
+    def toKV(d):
+        keys = [k for k in d]
+        vals = [d[k] for k in keys]
+        return keys, vals
+    keys, vals = toKV(updates)
+    dataChange = ','.join(['%s="%s"' % (k,v) for k,v in zip(keys, vals)])
+    updateStatement = "UPDATE Customer SET %s WHERE Cid=%d" % (dataChange, cid)
+    ExecuteRaw(updateStatement)
+    keys, vals = toKV(security)
+    dataChange = ','.join(['%s="%s"' % (k,v) for k,v in zip(keys, vals)])
+    updateStatement = "UPDATE Account SET %s WHERE Cid=%d" % (dataChange, cid)
+    ExecuteRaw(updateStatement)
     # password = m.update(request.form['password'].encode('utf-8').hexdigest())
     credit_cards = request.form # perform set operation to figure out which cards to add, update, and delete
-    billings = ['"%s"' % v for v in request.form.getlist("BillingAddr")]
-    names = ['"%s"' % v for v in request.form.getlist("Name")]
-    expires = ['"%s"' % v for v in request.form.getlist("ExpDate")]
-    seccodes = ['"%s"' % v for v in request.form.getlist("SecCode")]
-    types = ['"%s"' % v for v in request.form.getlist("Type")]
-    creditNumbers = ['"%s"' % v for v in request.form.getlist("CNumber")]
-    keys = ', '.join(["BillingAddr", "Name", "ExpDate", "SecCode", "Type", "CNumber"])
-    values = ', '.join([str((billings[i], names[i], expires[i], seccodes[i], types[i], creditNumbers[i])) for i in range(len(billings))])
+    billings = ['%s' % v for v in request.form.getlist("BillingAddr")]
+    names = ['%s' % v for v in request.form.getlist("Name")]
+    expires = ['%s' % v for v in request.form.getlist("ExpDate")]
+    seccodes = ['%s' % v for v in request.form.getlist("SecCode")]
+    types = ['%s' % v for v in request.form.getlist("Type")]
+    creditNumbers = [str(v) for v in request.form.getlist("CNumber")]
+    cids = [cid] * len(names)
+    keys = ', '.join(["BillingAddr", "Name", "ExpDate", "SecCode", "Type", "CNumber", "Cid"]).strip()
+    values = ', '.join([str((billings[i], names[i], expires[i], seccodes[i], types[i], creditNumbers[i], cids[i])) for i in range(len(billings))]).strip()
+
     deleteStatement = "DELETE FROM CreditCards WHERE Cid=%s" % cid
-    insertStatement = "INSERT INTO CreditCards (%s) VALUES %s" % (keys, values)
-    # ExecuteRaw(deleteStatement)
-    # ExecuteRaw(insertStatement)
     print(deleteStatement)
-    print(insertStatement)
-    return "OK"
+    ExecuteRaw(deleteStatement)
+    if values != None and values != "":
+        insertStatement = "INSERT INTO CreditCards (%s) VALUES %s" % (keys, values)
+        print(insertStatement)
+        ExecuteRaw(insertStatement)
+    return redirect(url_for("profile", code=302))
 
 @app.route('/newUser', methods=['POST'])
 def newUser():

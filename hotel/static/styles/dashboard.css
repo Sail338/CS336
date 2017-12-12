@@ -21,16 +21,17 @@ html, body {
   flex-flow: column;
   overflow-x: auto;
   padding-left: 10px;
-  padding-top: 10px;
+  padding-top: 0;
   padding-right: 10px;
   padding-bottom: 0; }
 
-.service-item, .room-time, .reesrvation-date, .total-cost, .invoice-no, .reservation-date {
+.breakfast-item, .service-item, .room-time, .reesrvation-date, .total-cost, .invoice-no, .reservation-date {
   display: flex;
   flex-flow: row; }
 
 .bold {
-  margin-right: 10px; }
+  margin-right: 10px;
+  font-weight: bold; }
 
 .room-no, .room-time, .room-price, .review-button {
   font-size: 12px; }
@@ -44,13 +45,10 @@ html, body {
   background: #888888;
   background-color: #888888; }
 
-.bold {
-  font-weight: bold; }
-
-.service-item, .room-time {
+.breakfast-item, .service-item, .room-time {
   align-items: center; }
 
-.service-item a {
+.breakfast-item a, .service-item a {
   margin-left: 10px; }
 
 .review {

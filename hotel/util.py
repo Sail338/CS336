@@ -43,7 +43,9 @@ def InsertQueryKV(table, fields):
 def ExecuteRaw(query, fetch_one=False):
     conn = connect()
     with conn.cursor() as cursor:
+        print(query)
         cursor.execute(query)
+        conn.commit()
         return cursor.fetchone() if fetch_one else cursor.fetchall()
 
 def SelectQueryKV(table, columns="*", fields={}, fetch_one=False):
