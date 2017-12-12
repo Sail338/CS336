@@ -47,7 +47,7 @@ def submit_review():
     random.seed(int(time.time()))
     rid = random.randint(1000000, 9999999)
     review = {
-        "Cid": request.cookies.get("Session")
+        "Cid": request.cookies.get("Session"),
         "HotelId": int(request.form['hotelId']),
         "ReviewId": rid,
         "TextComment": request.form['comment'],
@@ -494,11 +494,9 @@ def hotel_page():
 @app.route('/add_checkout', methods=['POST'])
 def add_to_checkout():
     #check to see if person is logged in:
-    #user_id = request.cookies.get('Session')
     user_id = request.cookies.get("Session")
     checkout = request.cookies.get('Checkout')
     response = redirect(url_for("search_page"))
-    #THIS IS FOR TESTING!! WHEN REGISTRATION IS DONE THIS WILL CHANGE
     if user_id:
         checkoutList = request.form.getlist('add_check')
         listOfRooms = []
@@ -519,29 +517,32 @@ def add_to_checkout():
             response.set_cookie('Checkout', listOfRooms)
         return response
     else:
-        #return the user to the registration html
-        pass
+        return render_template("index.html")
 
 @app.route('/checkout', methods=["GET","POST"])
 def checkout():
-    #user_id = request.cookies.get('Session')
     user_id = request.cookies.get("Session")
-    checkout = json.loads(request.cookies.get('Checkout'))
+    if request.cookies.get('Checkout'):
+        checkout = json.loads(request.cookies.get('Checkout'))
+    else:
+        checkout = None
     if request.method == 'GET':
         if user_id:
-            listInCheckout = buildCheckoutData(checkout)
-            return render_template("checkout.html",CL=listInCheckout,initial="True")
+            if checkout:
+                listInCheckout = buildCheckoutData(checkout)
+                return render_template("checkout.html",CL=listInCheckout,initial="True")
+            else:
+                return render_template("search.html")
         else:
-            #reroute to register
-            pass
+            return render_template("index.html")
     elif request.method == 'POST':
-        #user_id = request.cookies.get('Session')
-        user_id = 2
         try:
             remove = request.form["remove"]
         except:
             remove = None
-        if user_id:
+        if not user_id:
+            return render_template("index.html")
+        else:
             if remove:
                 response = redirect(url_for("checkout"))
                 remove = json.loads(remove)
@@ -621,9 +622,12 @@ def checkout():
                 return render_template("checkout.html",CL=listOfData,total=total,cc=cc,creditCards=creditCards,initial=False)
 
 
+
 @app.route('/payment', methods=['POST'])
 def payment():
     user_id = request.cookies.get("Session")
+    if not user_id:
+        return render_template("index.html")
     checkout = json.loads(request.cookies.get('Checkout'))
     whatCard = request.form['card']
     if whatCard == "new":
@@ -634,7 +638,6 @@ def payment():
         if not(cNum and bAddr and sCode and tCard):
             return render_template("search.html")
         expDate = request.form['ed']
-        #user_id = request.cookies.get('Session')
         name = SelectQuery("SELECT Name FROM Customer WHERE Customer.Cid = %s",(user_id))
         name = name['Name']
         try:
@@ -653,6 +656,7 @@ def payment():
     #Fill In later
     now = datetime.datetime.now()
     InsertQuery("INSERT INTO Reservation VALUES (%s,%s,%s,%s,%s)",(invoiceNo,user_id,now,hotelId,total))
+    InsertQuery("UPDATE Customer SET InvoiceNo=%s WHERE Customer.Cid = %s",(invoiceNo,user_id))
     for x in checkout:
         d1 = datetime.datetime.strptime(x['entry'], "%Y-%m-%d")
         d2 = datetime.datetime.strptime(x['depart'], "%Y-%m-%d")
