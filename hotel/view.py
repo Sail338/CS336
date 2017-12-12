@@ -47,7 +47,7 @@ def submit_review():
     random.seed(int(time.time()))
     rid = random.randint(1000000, 9999999)
     review = {
-        "Cid": 1,
+        "Cid": request.cookies.get("Session")
         "HotelId": int(request.form['hotelId']),
         "ReviewId": rid,
         "TextComment": request.form['comment'],
@@ -138,7 +138,7 @@ def login():
 
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
-    cid = request.args.get('cid')
+    cid = request.cookies.get('Session')
     customer = SelectQueryKV("Customer", columns='Name', fields={'Cid': cid}, fetch_one=True)
     reservations = SelectQueryKV("Reservation", fields={'Cid': cid})
     hotels = []
@@ -172,7 +172,7 @@ Select * from CreditCards WHERE Cid = cid; (Credit Cards)
 '''
 @app.route("/profile", methods=['GET'])
 def profile():
-    cid = 2
+    cid = request.cookies.get("Session")
     personalQuery = "SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = %d and c.Cid = %d" % (cid,cid)
     personal = ExecuteRaw(personalQuery, fetch_one=True)
     personalKV = [(k, personal[k]) for k in ['Name', 'Email', 'Address', 'PhoneNo']]
@@ -185,7 +185,7 @@ def profile():
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
     m = hashlib.sha1()
-    cid = 2
+    cid = request.cookies.get("Session")
     updates = {
         "Name": request.form['Name'],
         "Address": request.form['Address'],
@@ -495,7 +495,7 @@ def hotel_page():
 def add_to_checkout():
     #check to see if person is logged in:
     #user_id = request.cookies.get('Session')
-    user_id = 2
+    user_id = request.cookies.get("Session")
     checkout = request.cookies.get('Checkout')
     response = redirect(url_for("search_page"))
     #THIS IS FOR TESTING!! WHEN REGISTRATION IS DONE THIS WILL CHANGE
@@ -525,7 +525,7 @@ def add_to_checkout():
 @app.route('/checkout', methods=["GET","POST"])
 def checkout():
     #user_id = request.cookies.get('Session')
-    user_id = 2
+    user_id = request.cookies.get("Session")
     checkout = json.loads(request.cookies.get('Checkout'))
     if request.method == 'GET':
         if user_id:
@@ -623,7 +623,7 @@ def checkout():
 
 @app.route('/payment', methods=['POST'])
 def payment():
-    user_id = 2
+    user_id = request.cookies.get("Session")
     checkout = json.loads(request.cookies.get('Checkout'))
     whatCard = request.form['card']
     if whatCard == "new":
@@ -664,7 +664,6 @@ def payment():
     return response
 @app.route('/stats',methods =['GET','POST'])
 def stastics():
-
     if request.method == 'POST':
         error = []
         print ("got here")
