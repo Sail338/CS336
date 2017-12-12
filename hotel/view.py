@@ -3,7 +3,9 @@ from hotel import app
 from hotel.util import isNum, buildCheckoutData, InsertQuery, InsertQueryKV, SelectQuery, SelectQueryKV, buildQueryBreakfasts, buildQuerySerices, buildQueryServiceBreakfasts, ExecuteRaw
 import hashlib
 import json
-import datetime
+import datetime, time
+import random
+
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -29,17 +31,47 @@ def authorize_credentials():
 
 @app.route("/review", methods=['GET'])
 def review():
+    cid = request.cookies.get("Session")
     title = request.args.get('title')
-    data = request.args.get('data')
+    data = request.args.get('data').split('-')
     dtype = data[0]
     ext = data[1:]
-    if dtype == 'hotel':
+    print(ext)
+    hotelid = ext[1]
+    extra = ext[-1]
+    return render_template("review.html", title=title, type=dtype, hotelId=hotelid, extra_key=dtype.lower(), extra=extra, max_rating=5)
+
+@app.route("/submitreview", methods=['POST'])
+def submit_review():
+    print(request.form)
+    random.seed(int(time.time()))
+    rid = random.randint(1000000, 9999999)
+    review = {
+        "Cid": 1,
+        "HotelId": int(request.form['hotelId']),
+        "ReviewId": rid,
+        "TextComment": request.form['comment'],
+        "Rating": int(request.form['rating'])
+    }
+    InsertQueryKV("Review", review)
+    extra = request.form['extra'] if 'extra' in request.form else None
+    sReview = {
+        "ReviewId": rid,
+        "HotelId": request.form['hotelId']
+    }
+    if request.form['type'] == 'room':
+        del sReview['HotelId']
+        sReview['RoomNo'] = int(extra)
+        InsertQueryKV("RoomReview", sReview)
+    elif request.form['type'] == 'hotel':
         pass
-    elif dtype == 'service':
-        pass
-    elif dtype == 'room':
-        pass
-    return "200"
+    elif request.form['type'] == 'service':
+        sReview['SType'] = extra
+        InsertQueryKV("ServiceReview", sReview)
+    elif request.form['type'] == 'breakfast':
+        sReview['BType'] = extra
+        InsertQueryKV("BreakfastReview", sReview)
+    return redirect('/dashboard', code=302)
 
 @app.route('/logoff', methods=['GET'])
 def logoff():

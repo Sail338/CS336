@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='styles/review.css') }}">
+        <meta charset="UTF-8">
+		<script
+		  src="https://code.jquery.com/jquery-3.2.1.min.js"
+		  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		  crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class='content'>
+            <div class='review-title'>
+                <p> {{ title }} </p>
+            </div>
+            <form id='form' action='/submitreview' method='POST'>
+                <div class='static'> <p> Hotel </p> <input type='text' name='hotelId' value="{{ hotelId }}" readonly> </div>
+                <div class='static'> <p> Type </p> <input type='text' name='type' value="{{ type }}" readonly> </div>
+                <div class='static'> <p> {{ extra_key.strip().capitalize() }} </p> <input type='text' name='extra' value='{{ extra }}' readonly></div>
+                <div class='static rating'> <p> Rating (out of {{ max_rating }}) </p> <input value=5 type='number' name='rating' min="1" max="{{ max_rating }}"> </div>
+                <div class='comment'>
+                    <p> Comments </p>
+                    <textarea rows="15" cols="50" name="comment" form="form" style="resize=none;"></textarea>
+                </div>
+                <input type='submit' value='Submit Review'>
+            </form>
+        </div>
+    </body>
+</html>
