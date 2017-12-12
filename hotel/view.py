@@ -16,14 +16,15 @@ def authorize_credentials():
     username = request.form['email']
     print(username)
     password = request.form['password']
+    email = request.form['email']
     m.update(password.encode('utf-8'))
     user = SelectQueryKV(table="Account", columns="Cid", fields={"Email": email, "Password": m.hexdigest()}, fetch_one=True)
     info_correct = user != None
     #Check username and password in the database
     if info_correct:
-        response = redirect(url_for("dashboard"))
+        response = make_response(redirect(url_for("dashboard")))
         userid = user['Cid']
-        response.set_cookie('Session', userid)
+        response.set_cookie('Session', str(userid))
         return response
     else:
         print("Incorrect Information Given")
@@ -31,7 +32,8 @@ def authorize_credentials():
 
 @app.route("/review", methods=['GET'])
 def review():
-    cid = request.cookies.get("Session")
+    cid = int(request.cookies.get("Session"))
+    print("Session ID: %d" % cid)
     title = request.args.get('title')
     data = request.args.get('data').split('-')
     dtype = data[0]
@@ -46,8 +48,9 @@ def submit_review():
     print(request.form)
     random.seed(int(time.time()))
     rid = random.randint(1000000, 9999999)
+    print("Session ID: %d" % request.cookies.get("Session"));
     review = {
-        "Cid": request.cookies.get("Session"),
+        "Cid": int(request.cookies.get("Session")),
         "HotelId": int(request.form['hotelId']),
         "ReviewId": rid,
         "TextComment": request.form['comment'],
@@ -75,7 +78,8 @@ def submit_review():
 
 @app.route('/logoff', methods=['GET'])
 def logoff():
-    user_id = request.cookies.get('Session')
+    user_id = int(request.cookies.get('Session'))
+    print("Session ID: %d" % user_id)
     if user_id:
         response = make_response(render_template('index.html',incorrect=False,logoff=True))
         response.set_cookie('Session','',expires=0)
@@ -133,12 +137,15 @@ class BreakfastR:
         self.desc = desc
 
 @app.route("/login", methods=['GET'])
+@app.route("/login", methods=['GET'])
 def login():
     return render_template("login.html")
 
+@app.route("/dashboard.html", methods=['GET'])
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
     cid = request.cookies.get('Session')
+    print("Session ID: %d" % cid)
     customer = SelectQueryKV("Customer", columns='Name', fields={'Cid': cid}, fetch_one=True)
     reservations = SelectQueryKV("Reservation", fields={'Cid': cid})
     hotels = []
@@ -170,9 +177,12 @@ def dashboard():
 SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = c.Cid; (Personal)
 Select * from CreditCards WHERE Cid = cid; (Credit Cards)
 '''
+
+@app.route("/profile.html", methods=['GET'])
 @app.route("/profile", methods=['GET'])
 def profile():
-    cid = request.cookies.get("Session")
+    cid = int(request.cookies.get("Session"))
+    print("Session ID: %d" % cid)
     personalQuery = "SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = %d and c.Cid = %d" % (cid,cid)
     personal = ExecuteRaw(personalQuery, fetch_one=True)
     personalKV = [(k, personal[k]) for k in ['Name', 'Email', 'Address', 'PhoneNo']]
@@ -185,7 +195,8 @@ def profile():
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
     m = hashlib.sha1()
-    cid = request.cookies.get("Session")
+    cid = int(request.cookies.get("Session"))
+    print("Session ID: %d" % cid)
     updates = {
         "Name": request.form['Name'],
         "Address": request.form['Address'],
@@ -232,6 +243,7 @@ def edit_profile():
 
 @app.route('/newUser', methods=['POST'])
 def newUser():
+    form = request.form
     accCid = "SELECT MAX(Cid)+1 as nCid from Account"
     accCid = ExecuteRaw(accCid, fetch_one=True)['nCid']
     nCid = accCid
@@ -257,6 +269,7 @@ def newUser():
     accEmail = ExecuteRaw(accEmail, fetch_one=True)
     if accEmail != None: # Email already exists
         return "Email already registered. Please go to the homepage and login."
+    InsertQueryKV("Customer", userData)
     InsertQueryKV("Account", accountData)
     response = make_response("200")
     return "Registration Success! Please return to the homepage and login"
@@ -346,66 +359,6 @@ def search():
     #Apply all these values into the query and rename query to be a list of dictionaries for all the info the hotel has in each dictionary
     return render_template('search.html',result=results,form_data= json.dumps(val))
 
-@app.route("/account_settings", methods=['GET','POST'])
-def account():
-    if request.method == 'GET':
-        #set variable info = the query that gives us the information of the user given session cookies
-        user_id = request.cookies.get('Session')
-        if request.form['submit'] != 'edit':
-            if user_id:
-                #info = user information
-                info = {"name":"Sam Azouzi","email":"sazouzi21@gmail.com","phone":"1234567891234"}
-                #credit_list will be a list of all this users credit cards
-                credit_list = [
-                {"cnumber":"12345617",
-                 "expdate":"10/30/2017",
-                 "type":"D",
-                 "seccode":"123",
-                 "name":"Sam Azouzi",
-                 "addr":"78 Woodbridge Lane something something"},
-                {"cnumber":"123412317",
-                 "expdate":"10/31/2017",
-                 "type":"C",
-                 "seccode":"123",
-                 "name":"Samd Azouzi",
-                 "addr":"21 Woodbridge Lane something something"},
-                {"cnumber":"321245617",
-                 "expdate":"11/30/2017",
-                 "type":"D",
-                 "seccode":"113",
-                 "name":"Sazouzi",
-                 "addr":"98 Woodbridge Lane something something"}
-                ]
-                return render_template('account.html',info=info,credit_list=credit_list)
-        else: # ??
-            pass #Continue
-    else:
-        user_id = request.cookies.get('Session')
-        if user_id:
-            return
-
-app.route('/registration', methods=['POST'])
-def register_account():
-    m = hashlib.sha1()
-    try:
-        args = {
-            "Email": request.form['email'],
-            "Password": m.update(request.form['password'].encode('utf-8')).hexdigest()
-        }
-        print(args)
-        # InsertQueryKV("Account", args) # Insert into db
-        return "200"
-    except:
-        return "Error: Bad values"
-@app.route('/register', methods=['GET'])
-def register_page():
-    # return registration page
-    pass
-
-@app.route('/browse', methods=['GET'])
-def browse():
-    pass
-
 @app.route('/hotel-page', methods=['POST'])
 def hotel_page():
     val = json.loads(request.form['hotel'])
@@ -494,7 +447,8 @@ def hotel_page():
 @app.route('/add_checkout', methods=['POST'])
 def add_to_checkout():
     #check to see if person is logged in:
-    user_id = request.cookies.get("Session")
+    user_id = int(request.cookies.get("Session"))
+    print("Session ID: %d" % user_id)
     checkout = request.cookies.get('Checkout')
     response = redirect(url_for("search_page"))
     if user_id:
@@ -523,13 +477,14 @@ def add_to_checkout():
 
 @app.route('/checkout', methods=["GET","POST"])
 def checkout():
-    user_id = request.cookies.get("Session")
+    user_id = int(request.cookies.get("Session"))
+    print("Session ID: %d" % user_id)
     if request.cookies.get('Checkout'):
         checkout = json.loads(request.cookies.get('Checkout'))
     else:
         checkout = None
     if request.method == 'GET':
-        if user_id:
+        if user_id and user_id >= 0:
             if checkout:
                 listInCheckout = buildCheckoutData(checkout)
                 return render_template("checkout.html",CL=listInCheckout,initial="True")
@@ -542,7 +497,7 @@ def checkout():
             remove = request.form["remove"]
         except:
             remove = None
-        if not user_id:
+        if not user_id or user_id == -1:
             return render_template("index.html")
         else:
             if remove:
@@ -627,8 +582,9 @@ def checkout():
 
 @app.route('/payment', methods=['POST'])
 def payment():
-    user_id = request.cookies.get("Session")
-    if not user_id:
+    user_id = int(request.cookies.get("Session"))
+    print("Session ID: %d" % user_id)
+    if not user_id or user_id == -1:
         return render_template("index.html")
     checkout = json.loads(request.cookies.get('Checkout'))
     whatCard = request.form['card']
@@ -668,6 +624,7 @@ def payment():
     response = make_response(render_template('search.html'))
     response.set_cookie('Checkout','',expires=0)
     return response
+
 @app.route('/stats',methods =['GET','POST'])
 def stastics():
     if request.method == 'POST':

@@ -17,14 +17,23 @@
 	</div>
 	<div id='content'>
 		{% block content %}{% endblock %}
-		<div id='sidebar'>
-            <div class='dh-sidebar-dashboard'>
-                <p> Dashboard </p>
-            </div>
-            <div class='dh-sidebar-profile'>
-                <p> Profile </p>
-            </div>
-		</div>
+    </div>
+    <div id='sidebar'>
+        <div class='sidebar-item' id='dh-sidebar-search' url='/search-page'>
+            <p> Search </p>
+        </div>
+        <div class='sidebar-item' id='dh-sidebar-dashboard' url='/dashboard'>
+            <p> Dashboard </p>
+        </div>
+        <div class='sidebar-item' id='dh-sidebar-profile' url='/profile'>
+            <p> Profile </p>
+        </div>
 	</div>
   </body>
+  <script>
+    $(".sidebar-item").click(function () {
+        console.log('http://localhost:5001/' + $(this).attr("url"));
+        window.location.href = 'http://localhost:5001' + $(this).attr("url");
+    });
+  </script>
 </html>
