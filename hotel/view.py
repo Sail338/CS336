@@ -642,33 +642,33 @@ def stastics():
         query1 = ""
         #Highest rated room time for each hotel
         if queryval == 'hr':
-            query1 = """SELECT dat.hotelid,dat.type FROM
+            query1 = """SELECT dat.hotelid,dat.type,h.address FROM
                     (SELECT rev.HotelId,max(rev.rating),room.type FROM Reservation res
                     INNER JOIN Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s and r.outdate between %s and %s
                     INNER JOIN Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
                     INNER JOIN RoomReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
-                    Room room on rev.HotelId = room.Hotelid AND rreview.roomno = room.roomno GROUP BY rev.hotelid) as dat"""
+                    Room room on rev.HotelId = room.Hotelid AND rreview.roomno = room.roomno GROUP BY rev.hotelid) as dat INNER JOIN Hotel h on h.hotelid = dat.hotelid"""
         elif queryval == 'sr':
             query1 = """
-                    SELECT dat.hotelid,dat.type from
+                    SELECT dat.hotelid,dat.type,h.address from
                             (SELECT rev.HotelId,max(rev.rating) as rate,s.Stype as type FROM Reservation res
                             INNER JOIN
                             Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND  r.outdate between %s and %s
                             INNER JOIN
                             Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
                             INNER JOIN ServiceReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
-                            Service s on rev.HotelId = s.Hotelid  GROUP BY rev.hotelid) as dat"""
+                            Service s on rev.HotelId = s.Hotelid  GROUP BY rev.hotelid) as dat INNER JOIN Hotel h on h.hotelid = dat.hotelid """
         elif queryval == 'br':
 
             query1 = """
-                    SELECT dat.hotelid,dat.type from
+                    SELECT dat.hotelid,dat.type,h.address from
                             (SELECT rev.HotelId,max(rev.rating) as rate,b.BType as type FROM Reservation res
                             INNER JOIN
                             Reserves r on res.HotelId = r.HotelId and r.indate between %s and %s AND r.outdate between %s and %s
                             INNER JOIN
                             Review rev on res.Hotelid = rev.HotelId and r.HotelId = rev.Hotelid and rev.cid = res.cid
                             INNER JOIN BreakfastReview rreview on rreview.reviewid = rev.reviewid INNER JOIN
-                            Breakfast  b on rev.HotelId = b.Hotelid  GROUP BY rev.hotelid) as dat"""
+                            Breakfast  b on rev.HotelId = b.Hotelid  GROUP BY rev.hotelid) as dat INNER JOIN Hotel h on h.hotelid = dat.hotelid"""
         else:
             query1 = """
                         SELECT c.name,sum(r.totalamt) as x FROM Reservation r INNER JOIN Customer c on r.cid = c.cid INNER JOIN Reserves re on re.hotelid = r.hotelid
