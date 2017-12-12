@@ -36,7 +36,7 @@ html, body {
 }
 
 $hotel-details-font: 12px;
-.service-item, .room-time, .reesrvation-date, .total-cost, .invoice-no, .reservation-date {
+.breakfast-item, .service-item, .room-time, .reesrvation-date, .total-cost, .invoice-no, .reservation-date {
     display: flex;
     flex-flow: row;
 }
@@ -61,11 +61,11 @@ $hotel-details-font: 12px;
     @include background(#888888);
 }
 
-.service-item, .room-time {
+.breakfast-item, .service-item, .room-time {
     align-items: center;
 }
 
-.service-item a {
+.breakfast-item a, .service-item a {
     margin-left: 10px;
 }
 
