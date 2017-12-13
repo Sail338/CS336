@@ -180,9 +180,6 @@
                     <div class="columns">
                         <div class="column">
                             <h3 class="title is-3 titleColored">Room Number: {{room['RoomNo']}}</h3>
-                            {% if room['Discount'] != 0 %}
-                              <p>This Room has a discount of {{room["Discount"]}}%!</p>
-                            {% endif %}
                             <h4 class="subtitle is-4 titleColored">Floor: {{room['FloorNo']}}</h4>
                             <button type="button" class="button reviewButton">Reviews</button>
                             <br><br>
@@ -196,6 +193,9 @@
                         <div class="column">
                         <p><b>Room Description:</b> {{room['Description']}}</p>
                         <p><b>Room Price Per Night:</b> {{room['Price']}}</p>
+                            {% if room['Discount'] != 0 %}
+                              <p><b>This Room has a discount of {{room["Discount"]}}%!</b></p>
+                            {% endif %}
                         <p><b>Room Capacity:</b> {{room['Capacity']}}</p>
                         </div>
                     </div>

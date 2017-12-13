@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/hotelPage.css') }}">
+</head>
+<body>
+
+    <section class="hero is-dark is-fullheight header-image">
+
+        <div class="hero-head">
+          <nav class="navbar">
+            <div class="container">
+
+              <div id="navbarMenuHeroA" class="navbar-menu">
+                <div class="navbar-end">
+                  <a href="/profile" class="navbar-item">
+                    Profile
+                </a>
+                <a href="/dashboard" class="navbar-item">
+                    Dashboard
+                </a>
+                <a href="/stats" class="navbar-item">
+                    Statistics
+                </a>
+                <a href='/search-page' class="navbar-item">
+                    Search
+                </a>
+                <a href="/checkout" class="navbar-item" method="Get">
+                    Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+    </nav>
+        <div class="container has-text-centered">
+          <h1 style="margin-top: 30px;" class="title is-1">Hotels Stayed</h1>
+        </div>
+</div>
+
+<div class="hero-body">
+  <div class="container">
+    {% for hotel in hotels %}
+    <h3 class="title">{{ hotel.name }}</h3>
+    {% for room in hotel.rooms %}
+    <div class="box">
+      <div class="has-text-centered">
+        <div class='room-no bold'><h3 class="title is-3 titleColored">Room Number: {{room.roomNo}}</h3></div>
+        <div class="room-time"><h4 class="subtitle is-4 titleColored">Stayed from {{ room.checkIn }} to {{ room.checkOut }}</h4></div>
+        <div class='room-price'><h5 class="subtitle is-5 titleColored">Price: {{ room.price }}</h5></div><br>
+        <div data="room-{{ hotel.name }}-{{ hotel.hotelId }}-{{ room.roomNo }}" class='review-room review-button review'><button class="button">Review</button></div> 
+    </div>
+    <br>
+    <div class="columns">
+
+        <div class="column is-4 is-offset-2">
+            {% for service in hotel.services %}
+            <p><tag class="tag is-info review-service review" data="service-{{ hotel.name }}-{{ hotel.hotelId }}-{{ service.stype }}">Review</tag>
+                {{ service.stype }} - {{ service.price }}</p>
+            {% endfor %}
+        </div>
+
+            <div class="column is-4 is-offset-1">
+                {% for breakfast in hotel.breakfasts %}
+                <div class='breakfast-item'>
+                    <p><tag class="tag is-info review-breakfast review" data="breakfast-{{ hotel.name }}-{{ hotel.hotelId }}-{{ breakfast.btype }}">Review</tag>
+                        {{ breakfast.btype }} - {{ breakfast.price }}</p>
+                </div>
+                    {% endfor %}
+            </div>
+    </div>
+    </div>
+    {% endfor %}
+    <div class="box has-text-centered">
+        <div class="columns">
+            <div class="column is-4">
+                <div class='reservation-date'><p class='bold'> Reservation Date</p><p> {{ hotel.resDate }} </p></div>
+            </div>
+            <div class="column is-4">
+                <div class='total-cost'><p class='bold'> Total</p><p> {{ hotel.total }} </p></div>
+            </div>
+            <div class="column is-4">
+                <div class='invoice-no'><p class='bold'> Invoice</p><p> {{ hotel.invoiceNo }} </p></div>
+            </div>
+        </div>
+        <div class='review-hotel review' data="hotel-{{ hotel.name }}-{{ hotel.hotelId }}"><button class="button">Review Hotel</button></div>
+
+    </div>
+        <hr>
+        {% endfor %}
+
+
+    </div>
+</div>
+
+</section>
+
+<!-- <div id='hotels-list'>
+    <div id='hotels-list-header bold'> Hotels Stayed </div>
+    {% for hotel in hotels %}
+    <div class='hotel-container'>
+        <div class='hotel-header'><p> {{ hotel.name }} </p></div>
+        <div class='hotel-rooms-container'>
+            {% for room in hotel.rooms %}
+            <div class='hotel-room'>
+                <div class='room-no bold'><p> Room {{ room.roomNo }} </p></div>
+
+                <div class='room-price'><p> Price: {{ room.price }} </p></div>
+                <div class='room-time'><p> Stayed from {{ room.checkIn }} to {{ room.checkOut }} </p><div data="room-{{ hotel.name }}-{{ hotel.hotelId }}-{{ room.roomNo }}" class='review-room review-button review'><p> Review </p></div></div>
+            </div>
+            <div class='hotel-divider'></div>
+            {% endfor %}
+        </div>
+        <div class='services-list'>
+            <div class='services-header bold'><p> Services </p></div>
+            {% for service in hotel.services %}
+            <div class='service-item'><p>{{ service.stype }} - {{ service.price }}</p><a class='review-service review' data="service-{{ hotel.name }}-{{ hotel.hotelId }}-{{ service.stype }}"> Review </a></div>
+            {% endfor %}
+        </div>
+        <div class='breakfasts-list'>
+            <div class='breakfasts-header bold'><p> Services </p></div>
+            {% for breakfast in hotel.breakfasts %}
+            <div class='breakfast-item'><p>{{ breakfast.btype }} - {{ breakfast.price }}</p><a class='review-breakfast review' data="breakfast-{{ hotel.name }}-{{ hotel.hotelId }}-{{ breakfast.btype }}"> Review </a></div>
+            {% endfor %}
+        </div>
+        <div class='reservation-date'><p class='bold'> Reservation Date</p><p> {{ hotel.resDate }} </p></div>
+        <div class='total-cost'><p class='bold'> Total</p><p> {{ hotel.total }} </p></div>
+        <div class='invoice-no'><p class='bold'> Invoice</p><p> {{ hotel.invoiceNo }} </p></div>
+        <div class='review-hotel review' data="hotel-{{ hotel.name }}-{{ hotel.hotelId }}"><p> Review Hotel </p></div>
+    </div>
+    <div class='hotel-div'></div>
+    {% endfor %}
+</div> -->
+
+
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $(".review").click(function () {
+                let attrs = $(this).attr("data").split("-");
+                let title = '';
+                if (attrs[0] === "room") {
+                    title = `Reviewing room No. ${attrs[2]} of Hotel at ${attrs[1]}`;
+                } else if (attrs[0] === "service") {
+                    title = `Reviewing ${attrs[3]} service of Hotel at ${attrs[1]}`;
+                }
+                if (attrs[0] === "hotel") {
+                    title = `Reviewing hotel at ${attrs[1]}`;
+                }
+                if (attrs[0] === 'breakfast') {
+                    title = `Reviewing ${attrs[3]} breakfast at ${attrs[1]}`;
+                }
+                console.log(title);
+                window.location.href = "http://localhost:5001/review?title=" + title + "&data=" + $(this).attr("data");
+            });
+        });
+    </script>
+</html>
