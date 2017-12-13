@@ -687,7 +687,7 @@ def stastics():
         else:
             query1 = """
                         SELECT c.name,sum(r.totalamt) as x FROM Reservation r INNER JOIN Customer c on r.cid = c.cid INNER JOIN Reserves re on re.hotelid = r.hotelid
-                        and re.indate between %s and %s and re.outdate between %s and %s GROUP BY r.cid ORDER BY x DSC
+                        and re.indate between %s and %s and re.outdate between %s and %s GROUP BY r.cid ORDER BY x DESC
                     """
 
 
