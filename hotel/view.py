@@ -144,7 +144,7 @@ def login():
 @app.route("/dashboard.html", methods=['GET'])
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
-    cid = request.cookies.get('Session')
+    cid = int(request.cookies.get('Session'))
     print("Session ID: %d" % cid)
     customer = SelectQueryKV("Customer", columns='Name', fields={'Cid': cid}, fetch_one=True)
     reservations = SelectQueryKV("Reservation", fields={'Cid': cid})
@@ -582,8 +582,8 @@ def checkout():
 
 @app.route('/payment', methods=['POST'])
 def payment():
-    user_id = int(request.cookies.get("Session"))
-    print("Session ID: %d" % user_id)
+    print("Request received")
+    user_id = request.cookies.get("Session")
     if not user_id or user_id == -1:
         return render_template("index.html")
     checkout = json.loads(request.cookies.get('Checkout'))
@@ -598,10 +598,8 @@ def payment():
         expDate = request.form['ed']
         name = SelectQuery("SELECT Name FROM Customer WHERE Customer.Cid = %s",(user_id))
         name = name['Name']
-        try:
-            InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(user_id,cNum,bAddr,name,sCode,tCard,expDate))
-        except:
-            return render_template("search.html")
+        InsertQuery("INSERT INTO CreditCards VALUES (%s,%s,%s,%s,%s,%s,%s)",(user_id,cNum,bAddr,name,sCode,tCard,expDate))
+        # return render_template("search.html")
 
 
     hotelId = checkout[0]['id']
@@ -610,12 +608,14 @@ def payment():
     if invoiceNo['ino'] == None:
         invoiceNo = 0
     else:
+        print("INV1", invoiceNo['ino'])
         invoiceNo = int(invoiceNo['ino']) + 1
     #Fill In later
+    print("INV2", invoiceNo)
     now = datetime.datetime.now()
-    InsertQuery("INSERT INTO Reservation VALUES (%s,%s,%s,%s,%s)",(invoiceNo,user_id,now,hotelId,total))
-    InsertQuery("INSERT INTO CustomerReservationXRef VALUES (%s,%s)",(user_id,invoiceNo))
-    InsertQuery("UPDATE Customer SET InvoiceNo=%s WHERE Customer.Cid = %s",(invoiceNo,user_id))
+    InsertQuery("INSERT INTO Reservation VALUES (%s,%s,%s,%s,%s)", (invoiceNo,user_id,now,hotelId,total))
+    InsertQuery("INSERT INTO CustomerReservationXRef VALUES (%s,%s)", (user_id,invoiceNo))
+    InsertQuery("UPDATE Customer SET InvoiceNo=%s WHERE Customer.Cid = %s", (invoiceNo,user_id))
     for x in checkout:
         d1 = datetime.datetime.strptime(x['entry'], "%Y-%m-%d")
         d2 = datetime.datetime.strptime(x['depart'], "%Y-%m-%d")
