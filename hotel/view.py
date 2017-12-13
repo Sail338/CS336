@@ -55,7 +55,7 @@ def submit_review():
     print(request.form)
     random.seed(int(time.time()))
     rid = random.randint(1000000, 9999999)
-    print("Session ID: %d" % request.cookies.get("Session"));
+#    print("Session ID: %d" % request.cookies.get("Session"));
     review = {
         "Cid": int(request.cookies.get("Session")),
         "HotelId": int(request.form['hotelId']),
