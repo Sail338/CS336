@@ -273,7 +273,9 @@ def newUser():
         "Address": form['address'],
         'Cid': nCid
     }
-
+    for k,v in userData:
+        if not v or v == '':
+            return rt("needs_fields.html")
     m = hashlib.sha1()
     m.update(form['password'].encode("utf-8"))
     accountData = {
