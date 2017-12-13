@@ -179,7 +179,7 @@ def dashboard():
         breakfasts = [BreakfastR(b['BType'], b['BPrice'], b['Description']) for b in breakfasts]
         name = '%s, %s %s, %s %s' % (hotel['Street'], hotel['City'], hotel['State'], hotel['Country'], hotel['Zip'])
         hotels.append(HotelR(invoiceNo, hotelId, name, resDate, rooms, services, breakfasts, totalAmt))
-    return render_template('dashboard.html', hotels=hotels)
+    return render_template('dashboard.html', hotels=filter(lambda h: len(h.rooms) > 0, hotels))
 
 '''
 ------------------------------------------------------------------------------------------

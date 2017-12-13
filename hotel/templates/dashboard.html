@@ -25,7 +25,7 @@
                 <div class='breakfasts-list'>
                     <div class='breakfasts-header bold'><p> Services </p></div>
                     {% for breakfast in hotel.breakfasts %}
-                        <div class='breakfast-item'><p>{{ breakfast.btype }} - {{ breakfast.desc }} - {{ breakfast.price }}</p><a class='review-breakfast review' data="breakfast-{{ hotel.name }}-{{ hotel.hotelId }}-{{ breakfast.btype }}"> Review </a></div>
+                        <div class='breakfast-item'><p>{{ breakfast.btype }} - {{ breakfast.price }}</p><a class='review-breakfast review' data="breakfast-{{ hotel.name }}-{{ hotel.hotelId }}-{{ breakfast.btype }}"> Review </a></div>
                     {% endfor %}
                 </div>
                 <div class='reservation-date'><p class='bold'> Reservation Date</p><p> {{ hotel.resDate }} </p></div>
