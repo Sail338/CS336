@@ -499,13 +499,12 @@ def checkout():
     user_id = request.cookies.get("Session")
     if user_id == None:
         return rt("login_message.html")
-    print("Session ID: %d" % user_id)
     if request.cookies.get('Checkout'):
         checkout = json.loads(request.cookies.get('Checkout'))
     else:
         checkout = None
     if request.method == 'GET':
-        if user_id and user_id >= 0:
+        if user_id:
             if checkout:
                 listInCheckout = buildCheckoutData(checkout)
                 return render_template("checkout.html",CL=listInCheckout,initial="True")
@@ -518,7 +517,7 @@ def checkout():
             remove = request.form["remove"]
         except:
             remove = None
-        if not user_id or user_id == -1:
+        if not user_id:
             return render_template("index.html")
         else:
             if remove:
