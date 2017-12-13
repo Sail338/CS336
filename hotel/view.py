@@ -6,6 +6,8 @@ import json
 import datetime, time
 import random
 
+rt = render_template
+
 @app.route('/')
 def home():
     return render_template('index.html',incorrect=False,logoff=False)
@@ -32,7 +34,10 @@ def authorize_credentials():
 
 @app.route("/review", methods=['GET'])
 def review():
-    cid = int(request.cookies.get("Session"))
+    cid = request.cookies.get("Session")
+    if cid == None:
+        return rt('login_message.html')
+    cid = int(cid)
     print("Session ID: %d" % cid)
     title = request.args.get('title')
     data = request.args.get('data').split('-')
@@ -45,6 +50,8 @@ def review():
 
 @app.route("/submitreview", methods=['POST'])
 def submit_review():
+    if request.cookies.get("Session") == None:
+        return rt("login_message.html")
     print(request.form)
     random.seed(int(time.time()))
     rid = random.randint(1000000, 9999999)
@@ -78,7 +85,10 @@ def submit_review():
 
 @app.route('/logoff', methods=['GET'])
 def logoff():
-    user_id = int(request.cookies.get('Session'))
+    user_id = request.cookies.get('Session')
+    if user_id == None:
+        return rt("login_message.html")
+    user_id = int(user_id)
     print("Session ID: %d" % user_id)
     if user_id:
         response = make_response(render_template('index.html',incorrect=False,logoff=True))
@@ -136,7 +146,7 @@ class BreakfastR:
         self.price = price
         self.desc = desc
 
-@app.route("/login", methods=['GET'])
+@app.route("/login.html", methods=['GET'])
 @app.route("/login", methods=['GET'])
 def login():
     return render_template("login.html")
@@ -144,7 +154,10 @@ def login():
 @app.route("/dashboard.html", methods=['GET'])
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
-    cid = int(request.cookies.get('Session'))
+    cid = request.cookies.get('Session')
+    if cid == None:
+        return rt("login_message.html")
+    cid = int(cid)
     print("Session ID: %d" % cid)
     customer = SelectQueryKV("Customer", columns='Name', fields={'Cid': cid}, fetch_one=True)
     reservations = SelectQueryKV("Reservation", fields={'Cid': cid})
@@ -181,7 +194,10 @@ Select * from CreditCards WHERE Cid = cid; (Credit Cards)
 @app.route("/profile.html", methods=['GET'])
 @app.route("/profile", methods=['GET'])
 def profile():
-    cid = int(request.cookies.get("Session"))
+    cid = request.cookies.get("Session")
+    if cid == None:
+        return rt("login_message.html")
+    cid = int(cid)
     print("Session ID: %d" % cid)
     personalQuery = "SELECT a.Email, a.Address, c.Name, c.PhoneNo from Account a INNER JOIN Customer c on a.Cid = %d and c.Cid = %d" % (cid,cid)
     personal = ExecuteRaw(personalQuery, fetch_one=True)
@@ -195,7 +211,10 @@ def profile():
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
     m = hashlib.sha1()
-    cid = int(request.cookies.get("Session"))
+    cid = request.cookies.get("Session")
+    if cid == None:
+        return rt("login_message.html")
+    cid = int(cid)
     print("Session ID: %d" % cid)
     updates = {
         "Name": request.form['Name'],
@@ -477,7 +496,9 @@ def add_to_checkout():
 
 @app.route('/checkout', methods=["GET","POST"])
 def checkout():
-    user_id = int(request.cookies.get("Session"))
+    user_id = request.cookies.get("Session")
+    if user_id == None:
+        return rt("login_message.html")
     print("Session ID: %d" % user_id)
     if request.cookies.get('Checkout'):
         checkout = json.loads(request.cookies.get('Checkout'))
@@ -584,8 +605,8 @@ def checkout():
 def payment():
     print("Request received")
     user_id = request.cookies.get("Session")
-    if not user_id or user_id == -1:
-        return render_template("index.html")
+    if user_id == None:
+        return rt("login_message.html")
     checkout = json.loads(request.cookies.get('Checkout'))
     whatCard = request.form['card']
     if whatCard == "new":
@@ -698,3 +719,7 @@ def stastics():
         return render_template("statistics.html",result = restultsquery1,error=error,bestc = lis)
     else:
         return render_template("statistics.html")
+
+@app.route("/<other_route>", methods=['GET', 'POST'])
+def other(other_route):
+    return rt("no_route.html")
