@@ -55,7 +55,7 @@ def submit_review():
     print(request.form)
     random.seed(int(time.time()))
     rid = random.randint(1000000, 9999999)
-    print("Session ID: %d" % request.cookies.get("Session"));
+#    print("Session ID: %d" % request.cookies.get("Session"));
     review = {
         "Cid": int(request.cookies.get("Session")),
         "HotelId": int(request.form['hotelId']),
@@ -179,7 +179,7 @@ def dashboard():
         breakfasts = [BreakfastR(b['BType'], b['BPrice'], b['Description']) for b in breakfasts]
         name = '%s, %s %s, %s %s' % (hotel['Street'], hotel['City'], hotel['State'], hotel['Country'], hotel['Zip'])
         hotels.append(HotelR(invoiceNo, hotelId, name, resDate, rooms, services, breakfasts, totalAmt))
-    return render_template('dashboard.html', hotels=filter(lambda h: len(h.rooms) > 0, hotels))
+    return render_template('dash.html', hotels=filter(lambda h: len(h.rooms) > 0, hotels))
 
 '''
 ------------------------------------------------------------------------------------------
@@ -689,7 +689,7 @@ def stastics():
         else:
             query1 = """
                         SELECT c.name,sum(r.totalamt) as x FROM Reservation r INNER JOIN Customer c on r.cid = c.cid INNER JOIN Reserves re on re.hotelid = r.hotelid
-                        and re.indate between %s and %s and re.outdate between %s and %s GROUP BY r.cid ORDER BY x ASC
+                        and re.indate between %s and %s and re.outdate between %s and %s GROUP BY r.cid ORDER BY x DESC
                     """
 
 
