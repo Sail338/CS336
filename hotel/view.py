@@ -89,7 +89,6 @@ def logoff():
     if user_id == None:
         return rt("login_message.html")
     user_id = int(user_id)
-    print("Session ID: %d" % user_id)
     if user_id:
         response = make_response(render_template('index.html',incorrect=False,logoff=True))
         response.set_cookie('Session','',expires=0)
