@@ -206,7 +206,7 @@ def profile():
     creditCardsKV = [[((k,k, cc[k]) if isinstance(k, str) else (k[0], k[1], cc[k[1]])) for k in [('Credit Card Number', 'CNumber'), 'Name',
                                                                           ('Billing Address', 'BillingAddr'), ('CVV', 'SecCode'),
                                                                           'Type', ('Expires', 'ExpDate')]] for cc in creditCards]
-    return render_template("profile.html", personal=personalKV, ccs=creditCardsKV)
+    return render_template("prof.html", personal=personalKV, ccs=creditCardsKV)
 
 @app.route('/profileedit', methods=['POST'])
 def edit_profile():
