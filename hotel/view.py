@@ -371,8 +371,8 @@ def search():
     else:
         results = SelectQuery(sqlst,(countries,states,minCost,maxCost),one= False)
 
-
-
+    if len(results) == 0:
+        error.append("No results")
 
     if error:
         return render_template('search.html',error=error,length=len(error))
